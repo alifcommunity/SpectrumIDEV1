@@ -274,8 +274,14 @@ class Ui_MainWin(object):
     def execute_file(self):
         start_time = time.time()
         command = self.file_name.rstrip('.alif')
+        log_file = self.file_name+'.log'
         os.system("alif %s" % self.file_name)
-        result = subprocess.getoutput(command)
+        if os.path.lexists(log_file):
+            with open(log_file, 'r') as log_f:
+                result = log_f.read()
+            os.remove(log_file)
+        else:
+            result = subprocess.getoutput(command)
         process_time = round(time.time() - start_time, 5)
         self.result.setText(f"{result}\n\n [finished in: {process_time}]\n")
 
