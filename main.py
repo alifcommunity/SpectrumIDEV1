@@ -211,6 +211,7 @@ class Ui_MainWin(object):
         QFileDialog.setWindowIcon(MainWin,QIcon("./icons/Alif.png"))
         self.fileOpened = False
         self.fileSaved = False
+        self.file_name = None
 
 
 
