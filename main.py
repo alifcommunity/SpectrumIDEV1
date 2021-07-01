@@ -5,12 +5,6 @@ import subprocess
 import sys
 import os
 
-try:
-    from PyQt6 import sip
-except ImportError:
-    import sip
-
-
 class Ui_MainWin(object):
 
     def setupUi(self, MainWin):
@@ -242,8 +236,8 @@ class Ui_MainWin(object):
 
     def open(self):
         try:
-            self.openFileName, _ = QFileDialog.getOpenFileName(MainWin, "فتح ملف ألف","","Alif File (*.alif)")
-            with open(self.openFileName, "r", encoding="utf-8") as openFile:
+            self.file_name, _ = QFileDialog.getOpenFileName(MainWin, "فتح ملف ألف","","Alif File (*.alif)")
+            with open(self.file_name, "r", encoding="utf-8") as openFile:
                 fileCode = openFile.read()
                 self.code.setPlainText(fileCode)
                 openFile.close()
@@ -255,16 +249,16 @@ class Ui_MainWin(object):
         try:
             code = self.code.toPlainText()
             if self.fileOpened:
-                with open(self.openFileName, "w", encoding="utf-8") as saveFile:
+                with open(self.file_name, "w", encoding="utf-8") as saveFile:
                     saveFile.write(code)
                     saveFile.close()
             elif self.fileSaved:
-                with open(self.saveFileName, "w", encoding="utf-8") as saveFile:
+                with open(self.file_name, "w", encoding="utf-8") as saveFile:
                     saveFile.write(code)
                     saveFile.close()
             else:
-                self.saveFileName, _ = QFileDialog.getSaveFileName(MainWin, "حفظ ملف ألف", "تجربة.alif", "Alif File (*.alif)")
-                with open(self.saveFileName, "w", encoding="utf-8") as saveFile:
+                self.file_name, _ = QFileDialog.getSaveFileName(MainWin, "حفظ ملف ألف", "تجربة.alif", "Alif File (*.alif)")
+                with open(self.file_name, "w", encoding="utf-8") as saveFile:
                     saveFile.write(code)
                     saveFile.close()
                 self.fileSaved = True
@@ -300,7 +294,7 @@ class Ui_MainWin(object):
             self.result.setText(log_open.read())
         else:
             process = subprocess.Popen("temp.exe", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                       universal_newlines=True, encoding="utf-8", cwd=fileDir)
+                                        universal_newlines=True, encoding="utf-8", cwd=fileDir)
             rc = process.wait()
             out, err = process.communicate()
             self.result.setText(out + "\n" + err)
