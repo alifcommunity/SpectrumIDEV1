@@ -3,6 +3,8 @@
 # Spectrum IDE
 بيئة تطوير لغة ألف 3
 
+ ![واجهة محرر ألف طيف](https://user-images.githubusercontent.com/77246874/124166242-41045d80-daab-11eb-9501-5bbcd6f5a19c.png)
+ 
 طريقة التتبيث 
 
 <div dir=ltr>
