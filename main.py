@@ -197,7 +197,7 @@ class Ui_MainWin(object):
         self.resizeGrip.setFixedWidth(15)
         self.resizeGrip.setFixedHeight(15)
         self.resizeLable = QLabel(self.resizeGrip)
-        self.resizeLable.setPixmap(QPixmap("icons\Resize.png"))
+        self.resizeLable.setPixmap(QPixmap("./icons/Resize.png"))
 
         self.horizontalLayout.addWidget(self.resizeGrip)
         self.vCodefrmLay.addWidget(self.statusbar)
