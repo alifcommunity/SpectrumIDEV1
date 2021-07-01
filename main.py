@@ -267,6 +267,7 @@ class Ui_MainWin(object):
             pass
 
     def run(self):
+        self.save()
         fileDir = "Temp"
         if not os.path.exists(fileDir):
             os.mkdir(fileDir)
