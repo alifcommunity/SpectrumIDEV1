@@ -48,7 +48,7 @@ class Ui_MainWin(object):
         self.alifBtn.setFixedHeight(40)
         self.alifBtn.setFixedWidth(40)
         self.alifBtn.setStyleSheet("background-color: \"#1c1d20\";border: 0px")
-        self.alifBtn.setIcon(QIcon("icons\Alif.png"))
+        self.alifBtn.setIcon(QIcon("./icons/Alif.ico"))
         self.alifBtn.setIconSize(QSize(25, 25))
 
         self.hLogofrmLay.addWidget(self.alifBtn)
@@ -78,7 +78,7 @@ class Ui_MainWin(object):
         self.minimizeBtn.setFixedHeight(25)
         self.minimizeBtn.setFixedWidth(25)
         self.minimizeBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";border: 0px;border-radius: 3px;}QPushButton:hover{background-color:  rgb(73, 85, 255);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.minimizeBtn.setIcon(QIcon("icons\Minimize.png"))
+        self.minimizeBtn.setIcon(QIcon("./icons/Minimize.png"))
         self.minimizeBtn.setIconSize(QSize(13, 13))
         self.minimizeBtn.clicked.connect(MainWin.showMinimized)
 
@@ -88,7 +88,7 @@ class Ui_MainWin(object):
         self.maximizeBtn.setFixedWidth(25)
         self.maximizeBtn.setFixedHeight(25)
         self.maximizeBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";border: 0px;border-radius: 3px;}QPushButton:hover{background-color:  rgb(73, 85, 255);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.maximizeBtn.setIcon(QIcon("icons\Maximize.png"))
+        self.maximizeBtn.setIcon(QIcon("./icons/Maximize.png"))
         self.maximizeBtn.setIconSize(QSize(13, 13))
         self.maximizeBtn.clicked.connect(self.restore)
 
@@ -98,7 +98,7 @@ class Ui_MainWin(object):
         self.closeBtn.setFixedHeight(25)
         self.closeBtn.setFixedWidth(25)
         self.closeBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";border: 0px;border-radius: 3px;}QPushButton:hover{background-color: rgb(218, 0, 0);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.closeBtn.setIcon(QIcon("icons\Close.png"))
+        self.closeBtn.setIcon(QIcon("./icons/Close.png"))
         self.closeBtn.setIconSize(QSize(13, 13))
         self.closeBtn.clicked.connect(MainWin.close)
 
@@ -133,7 +133,7 @@ class Ui_MainWin(object):
         self.openBtn.setFixedWidth(40)
         self.openBtn.setFixedHeight(40)
         self.openBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";color: rgb(255, 255, 255);border: 0px;border-radius: 6px;}QPushButton:hover{background-color:  rgb(73, 85, 255);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.openBtn.setIcon(QIcon("icons\Open.png"))
+        self.openBtn.setIcon(QIcon("./icons/Open.png"))
         self.openBtn.setIconSize(QSize(25, 25))
         self.openBtn.clicked.connect(self.open)
 
@@ -143,7 +143,7 @@ class Ui_MainWin(object):
         self.saveBtn.setFixedHeight(40)
         self.saveBtn.setFixedWidth(40)
         self.saveBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";color: rgb(255, 255, 255);border: 0px;border-radius: 6px;}QPushButton:hover{background-color:  rgb(73, 85, 255);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.saveBtn.setIcon(QIcon("icons\Save.png"))
+        self.saveBtn.setIcon(QIcon("./icons/Save.png"))
         self.saveBtn.setIconSize(QSize(25, 25))
         self.saveBtn.clicked.connect(self.save)
 
@@ -160,7 +160,7 @@ class Ui_MainWin(object):
         self.runBtn.setFixedWidth(40)
         self.runBtn.setFixedHeight(40)
         self.runBtn.setStyleSheet("QPushButton{background-color:\"#1c1d20\";color: rgb(255, 255, 255);border: 0px;border-radius: 6px;}QPushButton:hover{background-color:rgb(246, 255, 67);}QPushButton:pressed{background-color: rgb(223, 227, 0);}")
-        self.runBtn.setIcon(QIcon("icons\Run.png"))
+        self.runBtn.setIcon(QIcon("./icons/Run.png"))
         self.runBtn.setIconSize(QSize(25, 25))
         self.runBtn.clicked.connect(self.run)
 
@@ -214,7 +214,7 @@ class Ui_MainWin(object):
         self.retranslateUi(MainWin)
         QMetaObject.connectSlotsByName(MainWin)
 
-        QFileDialog.setWindowIcon(MainWin,QIcon("icons\Alif.png"))
+        QFileDialog.setWindowIcon(MainWin,QIcon("./icons/Alif.png"))
         self.fileOpened = False
         self.fileSaved = False
 
