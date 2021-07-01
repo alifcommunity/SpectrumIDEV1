@@ -4,6 +4,7 @@ from PyQt6.QtGui import QIcon, QPixmap
 import subprocess
 import sys
 import os
+import time
 
 class Ui_MainWin(object):
 
@@ -263,43 +264,25 @@ class Ui_MainWin(object):
                     saveFile.write(code)
                     saveFile.close()
                 self.fileSaved = True
+            if self.file_name:
+                return True
+            else:
+                return False
         except:
             pass
 
+    def execute_file(self):
+        start_time = time.time()
+        command = self.file_name.rstrip('.alif')
+        os.system("alif %s" % self.file_name)
+        result = subprocess.getoutput(command)
+        process_time = round(time.time() - start_time, 5)
+        self.result.setText(f"{result}\n\n [finished in: {process_time}]\n")
+
     def run(self):
-        self.save()
-        fileDir = "Temp"
-        if not os.path.exists(fileDir):
-            os.mkdir(fileDir)
-        else:
-            pass
-
-        code = self.code.toPlainText()
-
-        with open(fileDir + r"\temp.alif", "w", encoding="utf-8") as tempFile:
-            tempFile.write(code)
-            tempFile.close()
-
-        commandALIF = fileDir + r"\temp.alif"
-        if os.path.exists(r"Temp\temp.exe"):
-            os.remove(r"Temp\temp.exe")
-            os.system(commandALIF)
-        else:
-            os.system(commandALIF)
-
-        commandEXE = fileDir + r"\temp.exe"
-        res = os.system(commandEXE)
-
-        if res == 1:
-            log = fileDir + r"\temp.alif.log"
-            log_open = open(log, "r", encoding="utf-8")
-            self.result.setText(log_open.read())
-        else:
-            process = subprocess.Popen("temp.exe", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        universal_newlines=True, encoding="utf-8", cwd=fileDir)
-            rc = process.wait()
-            out, err = process.communicate()
-            self.result.setText(out + "\n" + err)
+        has_file = self.save()
+        if has_file:
+            self.execute_file()
 
     def retranslateUi(self, MainWin):
         _translate = QCoreApplication.translate
