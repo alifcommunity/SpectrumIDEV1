@@ -286,9 +286,9 @@ class Ui_MainWin(object):
         commandALIF = fileDir + r"\temp.alif"
         if os.path.exists(r"Temp\temp.exe"):
             os.remove(r"Temp\temp.exe")
-            res = os.system(commandALIF)
+            res = os.system("alif " + commandALIF)
         else:
-            res = os.system(commandALIF)
+            res = os.system("alif " + commandALIF)
 
         if res == 0:
             commandEXE = fileDir + r"\temp.exe"
