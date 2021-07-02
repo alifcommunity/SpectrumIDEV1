@@ -293,12 +293,6 @@ class Ui_MainWin(object):
         if res == 0:
             commandEXE = fileDir + r"\temp.exe"
             os.system(commandEXE)
-        elif res == 1:
-            log = fileDir + r"\temp.alif.log"
-            log_open = open(log, "r", encoding="utf-8")
-            self.result.setText(log_open.read())
-            log_open.close()
-        else:
             start_time = time.time()
             process = subprocess.Popen("temp.exe", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                        universal_newlines=True, encoding="utf-8", cwd=fileDir)
@@ -306,6 +300,11 @@ class Ui_MainWin(object):
             out, err = process.communicate()
             process_time = round(time.time() - start_time, 5)
             self.result.setText(f"{out}\n{err}\n\n [انتهى التنفيذ خلال: {process_time} ثانية]\n")
+        else:
+            log = fileDir + r"\temp.alif.log"
+            log_open = open(log, "r", encoding="utf-8")
+            self.result.setText(log_open.read())
+            log_open.close()
 
     def retranslateUi(self, MainWin):
         _translate = QCoreApplication.translate
