@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QFrame, QTextEdit, QApplication, QSizeGrip, QFileDialog
 from PyQt6.QtCore import QSize, Qt, QMetaObject, QCoreApplication, QPointF
-from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtGui import QIcon, QPixmap, QFont
 import subprocess
 import sys
 import os
@@ -171,6 +171,7 @@ class Ui_MainWin(object):
 
         self.code = QTextEdit(self.codefrm)
         self.code.setTabStopDistance(16)
+        self.code.setFont(QFont("Tajawal"))
         self.code.setStyleSheet("background-color: rgb(39, 41, 45);color: rgb(255, 255, 255);font: 12pt \"Tajawal\";border : 30px;border-radius: 10px;border-color: rgb(255, 255, 255);")
 
         self.vCodefrmLay.addWidget(self.code)
@@ -214,8 +215,6 @@ class Ui_MainWin(object):
         self.fileSaved = False
         self.file_name = None
 
-
-
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.m_flag = True
@@ -238,7 +237,7 @@ class Ui_MainWin(object):
 
     def open(self):
         try:
-            self.file_name, _ = QFileDialog.getOpenFileName(MainWin, "فتح ملف ألف","","Alif File (*.alif)")
+            self.file_name, _ = QFileDialog.getOpenFileName(MainWin, "فتح ملف ألف","","كل الملفات (*.alif)")
             with open(self.file_name, "r", encoding="utf-8") as openFile:
                 fileCode = openFile.read()
                 self.code.setPlainText(fileCode)
@@ -259,7 +258,7 @@ class Ui_MainWin(object):
                     saveFile.write(code)
                     saveFile.close()
             else:
-                self.file_name, _ = QFileDialog.getSaveFileName(MainWin, "حفظ ملف ألف", "تجربة.alif", "Alif File (*.alif)")
+                self.file_name, _ = QFileDialog.getSaveFileName(MainWin, "حفظ ملف ألف", "غير معنون.alif", "ملف ألف (*.alif)")
                 with open(self.file_name, "w", encoding="utf-8") as saveFile:
                     saveFile.write(code)
                     saveFile.close()
@@ -271,30 +270,48 @@ class Ui_MainWin(object):
         except:
             pass
 
-    def execute_file(self):
-        start_time = time.time()
-        command = self.file_name.rstrip('.alif')
-        log_file = self.file_name+'.log'
-        os.system("alif %s" % self.file_name)
-        if os.path.lexists(log_file):
-            with open(log_file, 'r') as log_f:
-                result = log_f.read()
-            os.remove(log_file)
-        else:
-            result = subprocess.getoutput(command)
-        process_time = round(time.time() - start_time, 5)
-        self.result.setText(f"{result}\n\n [finished in: {process_time}]\n")
-
     def run(self):
-        has_file = self.save()
-        if has_file:
-            self.execute_file()
+        fileDir = "Temp"
+        if not os.path.exists(fileDir):
+            os.mkdir(fileDir)
+        else:
+            pass
+
+        code = self.code.toPlainText()
+
+        with open(fileDir + r"\temp.alif", "w", encoding="utf-8") as tempFile:
+            tempFile.write(code)
+            tempFile.close()
+
+        commandALIF = fileDir + r"\temp.alif"
+        if os.path.exists(r"Temp\temp.exe"):
+            os.remove(r"Temp\temp.exe")
+            res = os.system(commandALIF)
+        else:
+            res = os.system(commandALIF)
+
+        if res == 0:
+            commandEXE = fileDir + r"\temp.exe"
+            os.system(commandEXE)
+        elif res == 1:
+            log = fileDir + r"\temp.alif.log"
+            log_open = open(log, "r", encoding="utf-8")
+            self.result.setText(log_open.read())
+            log_open.close()
+        else:
+            start_time = time.time()
+            process = subprocess.Popen("temp.exe", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                       universal_newlines=True, encoding="utf-8", cwd=fileDir)
+            rc = process.wait()
+            out, err = process.communicate()
+            process_time = round(time.time() - start_time, 5)
+            self.result.setText(f"{out}\n{err}\n\n [انتهى التنفيذ خلال: {process_time} ثانية]\n")
 
     def retranslateUi(self, MainWin):
         _translate = QCoreApplication.translate
         MainWin.setWindowTitle(_translate("MainWin", "MainWindow"))
         self.title.setText(_translate("MainWin", "طيف"))
-        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.1.0"))
+        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.1.1"))
 
 
 if __name__ == "__main__":
