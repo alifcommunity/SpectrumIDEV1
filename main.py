@@ -1,10 +1,15 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QFrame, QTextEdit, QApplication, QSizeGrip, QFileDialog
 from PyQt6.QtCore import QSize, Qt, QMetaObject, QCoreApplication, QPointF
-from PyQt6.QtGui import QIcon, QPixmap, QFont
+from PyQt6.QtGui import QIcon, QPixmap
 import subprocess
 import sys
 import os
 import time
+try:
+    from PyQt6 import sip
+except ImportError:
+    import sip
+#######################################################################################################################
 
 class Ui_MainWin(object):
 
@@ -124,6 +129,16 @@ class Ui_MainWin(object):
         self.vTopBtnsfrmLay.setContentsMargins(0, 0, 5, 0)
         self.vTopBtnsfrmLay.setSpacing(6)
 
+        self.newBtn = QPushButton(self.topbtnsfrm)
+        self.newBtn.setFixedWidth(40)
+        self.newBtn.setFixedHeight(40)
+        self.newBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";color: rgb(255, 255, 255);border: 0px;border-radius: 6px;}QPushButton:hover{background-color:  rgb(73, 85, 255);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
+        self.newBtn.setIcon(QIcon("./icons/New.png"))
+        self.newBtn.setIconSize(QSize(25, 25))
+        self.newBtn.clicked.connect(self.new)
+
+        self.vTopBtnsfrmLay.addWidget(self.newBtn)
+
         self.openBtn = QPushButton(self.topbtnsfrm)
         self.openBtn.setFixedWidth(40)
         self.openBtn.setFixedHeight(40)
@@ -171,7 +186,6 @@ class Ui_MainWin(object):
 
         self.code = QTextEdit(self.codefrm)
         self.code.setTabStopDistance(16)
-        self.code.setFont(QFont("Tajawal"))
         self.code.setStyleSheet("background-color: rgb(39, 41, 45);color: rgb(255, 255, 255);font: 12pt \"Tajawal\";border : 30px;border-radius: 10px;border-color: rgb(255, 255, 255);")
 
         self.vCodefrmLay.addWidget(self.code)
@@ -210,11 +224,11 @@ class Ui_MainWin(object):
         self.retranslateUi(MainWin)
         QMetaObject.connectSlotsByName(MainWin)
 
-        QFileDialog.setWindowIcon(MainWin,QIcon("./icons/Alif.png"))
+        QFileDialog.setWindowIcon(MainWin, QIcon("./icons/Alif.png"))
         self.fileOpened = False
         self.fileSaved = False
         self.file_name = None
-
+#######################################################################################################################
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.m_flag = True
@@ -231,9 +245,19 @@ class Ui_MainWin(object):
 
     def restore(self):
         if MainWin.isMaximized():
+            self.maximizeBtn.setIcon(QIcon("./icons/Maximize.png"))
             MainWin.showNormal()
         else:
+            self.maximizeBtn.setIcon(QIcon("./icons/Restore.png"))
             MainWin.showMaximized()
+
+    def new(self):
+        self.save()
+        self.code.setText("")
+        self.result.setText("")
+        self.fileOpened = False
+        self.fileSaved = False
+        self.file_name = None
 
     def open(self):
         try:
@@ -263,10 +287,6 @@ class Ui_MainWin(object):
                     saveFile.write(code)
                     saveFile.close()
                 self.fileSaved = True
-            if self.file_name:
-                return True
-            else:
-                return False
         except:
             pass
 
@@ -301,17 +321,20 @@ class Ui_MainWin(object):
             process_time = round(time.time() - start_time, 5)
             self.result.setText(f"{out}\n{err}\n\n [انتهى التنفيذ خلال: {process_time} ثانية]\n")
         else:
-            log = fileDir + r"\temp.alif.log"
-            log_open = open(log, "r", encoding="utf-8")
-            self.result.setText(log_open.read())
-            log_open.close()
+            try:
+                log = fileDir + r"\temp.alif.log"
+                log_open = open(log, "r", encoding="utf-8")
+                self.result.setText(log_open.read())
+                log_open.close()
+            except:
+                print("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح لديك")
 
     def retranslateUi(self, MainWin):
         _translate = QCoreApplication.translate
         MainWin.setWindowTitle(_translate("MainWin", "MainWindow"))
         self.title.setText(_translate("MainWin", "طيف"))
-        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.1.1"))
-
+        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.1.3"))
+#######################################################################################################################
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
