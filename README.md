@@ -3,10 +3,12 @@
 # Spectrum IDE
 بيئة تطوير لغة ألف 3
 
-![SpectrumUI](https://user-images.githubusercontent.com/77246874/125208049-10f45180-e245-11eb-9ea6-967a349ccaae.png)
+![SpectrumUI](https://user-images.githubusercontent.com/77246874/126808904-435c0f11-d8c3-4575-8a2e-1f0237065061.png)
  
 طريقة التتبيث 
 
+ قم بتثبيت الخطوط المرفقة
+ 
 <div dir=ltr>
  
 ```bash
