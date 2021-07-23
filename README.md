@@ -7,7 +7,8 @@
  
 طريقة التتبيث 
 
- قم بتثبيت الخطوط المرفقة
+ اولا قم بتثبيت الخطوط المرفقة
+ 
  
 <div dir=ltr>
  
@@ -46,7 +47,7 @@ pip3 install -r requirements.txt
 <div dir=ltr>
  
 ```bash
-python3 main.py
+python3 Spectrum.py
 ```
 <div dir="rtl">
  
