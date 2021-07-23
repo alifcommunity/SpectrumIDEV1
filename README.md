@@ -36,6 +36,8 @@ source venv/bin/activate
 <div dir="rtl">
 
 تنزيل المكاتب
+ 
+ 
 <div dir="ltr">
 
 ```bash
@@ -43,6 +45,7 @@ pip3 install -r requirements.txt
 ```
 <div dir="rtl">
 تنفيذ
+ 
  
 <div dir=ltr>
  
