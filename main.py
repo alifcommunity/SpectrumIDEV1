@@ -1,20 +1,90 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QFrame, QTextEdit, QApplication, QSizeGrip, QFileDialog
-from PyQt6.QtCore import QSize, Qt, QMetaObject, QCoreApplication, QPointF
-from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QFrame, QTextEdit, QApplication, QSizeGrip, QFileDialog, QPlainTextEdit
+from PyQt6.QtCore import QSize, Qt, QMetaObject, QCoreApplication, QPointF, QRect
+from PyQt6.QtGui import QIcon, QPixmap, QColor, QPainter
+from PyQt6 import sip
 import subprocess
 import sys
 import os
 import time
-try:
-    from PyQt6 import sip
-except ImportError:
-    import sip
+import alif_syn_pars
+
 #######################################################################################################################
+
+class BarNum(QFrame):
+    def __init__(self, editor):
+        super().__init__(editor)
+        self.code = editor
+
+    def sizeHint(self):
+        return QSize(self.editor.lineNumberAreaWidth(), 0)
+
+    def paintEvent(self, event):
+        self.code.PaintEvent(event)
+
+class CodeEditor(QPlainTextEdit):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.lineNumberArea = BarNum(self)
+        self.blockCountChanged.connect(self.updateLineNumberAreaWidth)
+        self.updateRequest.connect(self.updateLineNumberArea)
+        self.highlight = alif_syn_pars.PythonHighlighter(self.document())
+        txtOpt = self.document().defaultTextOption()
+        txtOpt.setAlignment(Qt.AlignmentFlag.AlignRight)
+        txtOpt.setTextDirection(Qt.LayoutDirection.RightToLeft)
+        self.document().setDefaultTextOption(txtOpt)
+        self.setStyleSheet("background-color: rgb(39, 41, 45);color: rgb(255, 255, 255);font: 12pt \"Tajawal\";border : 30px;border-radius: 10px;border-color: rgb(255, 255, 255); padding: 6px;")
+        self.setTabStopDistance(16)
+
+    def lineNumberAreaWidth(self):
+        digits = 1
+        max_value = max(1, self.document().blockCount())
+        while max_value >= 10:
+            max_value /= 10
+            digits += 1
+        space = 3 + self.fontMetrics().horizontalAdvance('9') * digits
+        return space
+
+    def updateLineNumberAreaWidth(self, _):
+        self.setViewportMargins(0, 0, self.lineNumberAreaWidth() + 20, 0)
+
+    def updateLineNumberArea(self, rect, dy):
+        if dy:
+            self.lineNumberArea.scroll(0, dy)
+        else:
+            self.lineNumberArea.update(0, rect.y(), self.lineNumberAreaWidth(), rect.height())
+        if rect.contains(self.viewport().rect()):
+            self.updateLineNumberAreaWidth(0)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        cr = self.contentsRect()
+        self.lineNumberArea.setGeometry(QRect(cr.right() - self.lineNumberAreaWidth() - 3, cr.top(), self.lineNumberAreaWidth(), cr.height()))
+
+    def PaintEvent(self, event):
+        painter = QPainter(self.lineNumberArea)
+
+        block = self.firstVisibleBlock()
+        blockNumber = block.blockNumber()
+        top = self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
+        bottom = top + self.blockBoundingRect(block).height()
+
+        height = self.fontMetrics().height()
+        while block.isValid() and (top <= event.rect().bottom()):
+            if block.isVisible() and (bottom >= event.rect().top()):
+                number = str(blockNumber + 1)
+                painter.setPen(QColor("#BABABA"))
+                painter.drawText(0, int(top), self.lineNumberArea.width(), height, Qt.AlignmentFlag.AlignCenter, number)
+
+            block = block.next()
+            top = bottom
+            bottom = top + self.blockBoundingRect(block).height()
+            blockNumber += 1
+
 
 class Ui_MainWin(object):
 
     def setupUi(self, MainWin):
-        MainWin.setGeometry(600, 600, 900, 500)
+        MainWin.setGeometry(600, 300, 1800, 900)
         MainWin.setMinimumSize(QSize(900, 500))
         MainWin.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
@@ -184,13 +254,12 @@ class Ui_MainWin(object):
         self.vCodefrmLay = QVBoxLayout(self.codefrm)
         self.vCodefrmLay.setContentsMargins(6, 0, 0, 6)
 
-        self.code = QTextEdit(self.codefrm)
-        self.code.setTabStopDistance(16)
-        self.code.setStyleSheet("background-color: rgb(39, 41, 45);color: rgb(255, 255, 255);font: 12pt \"Tajawal\";border : 30px;border-radius: 10px;border-color: rgb(255, 255, 255);")
+        self.code = CodeEditor(self.codefrm)
 
         self.vCodefrmLay.addWidget(self.code)
 
-        self.result = QTextEdit(self.codefrm, readOnly=True)
+        self.result = QTextEdit(self.codefrm)
+        self.result.setReadOnly(True)
         self.result.setFixedHeight(150)
         self.result.setStyleSheet("background-color:rgb(10, 11, 12);color: rgb(255, 255, 255);font: 12pt \"Tajawal\";border: 0px;border-radius: 10px;")
 
@@ -228,7 +297,9 @@ class Ui_MainWin(object):
         self.fileOpened = False
         self.fileSaved = False
         self.file_name = None
+
 #######################################################################################################################
+
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.m_flag = True
@@ -253,15 +324,15 @@ class Ui_MainWin(object):
 
     def new(self):
         self.save()
-        self.code.setText("")
-        self.result.setText("")
+        self.code.clear()
+        self.result.clear()
         self.fileOpened = False
         self.fileSaved = False
         self.file_name = None
 
     def open(self):
         try:
-            self.file_name, _ = QFileDialog.getOpenFileName(MainWin, "فتح ملف ألف","","كل الملفات (*.alif)")
+            self.file_name, _ = QFileDialog.getOpenFileName(MainWin, "فتح ملف ألف", "", "كل الملفات (*.alif)")
             with open(self.file_name, "r", encoding="utf-8") as openFile:
                 fileCode = openFile.read()
                 self.code.setPlainText(fileCode)
@@ -297,6 +368,7 @@ class Ui_MainWin(object):
         else:
             pass
 
+        start_time = time.time()
         code = self.code.toPlainText()
 
         with open(fileDir + r"\temp.alif", "w", encoding="utf-8") as tempFile:
@@ -313,7 +385,6 @@ class Ui_MainWin(object):
         if res == 0:
             commandEXE = fileDir + r"\temp.exe"
             os.system(commandEXE)
-            start_time = time.time()
             process = subprocess.Popen("temp.exe", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                        universal_newlines=True, encoding="utf-8", cwd=fileDir)
             rc = process.wait()
@@ -333,7 +404,13 @@ class Ui_MainWin(object):
         _translate = QCoreApplication.translate
         MainWin.setWindowTitle(_translate("MainWin", "MainWindow"))
         self.title.setText(_translate("MainWin", "طيف"))
-        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.1.3"))
+        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.2.0"))
+        self.newBtn.setToolTip("جديد")
+        self.openBtn.setToolTip("فتح")
+        self.saveBtn.setToolTip("حفظ")
+        self.runBtn.setToolTip("تشغيل")
+
+
 #######################################################################################################################
 
 if __name__ == "__main__":
@@ -342,6 +419,6 @@ if __name__ == "__main__":
     ui = Ui_MainWin()
     ui.setupUi(MainWin)
     MainWin.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-    MainWin.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground,True)
+    MainWin.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
     MainWin.show()
     sys.exit(app.exec())
