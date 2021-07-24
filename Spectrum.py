@@ -407,7 +407,7 @@ class Ui_MainWin(object):
         _translate = QCoreApplication.translate
         MainWin.setWindowTitle(_translate("MainWin", "MainWindow"))
         self.title.setText(_translate("MainWin", "طيف"))
-        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.2.0"))
+        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.2.1"))
         self.newBtn.setToolTip("جديد")
         self.openBtn.setToolTip("فتح")
         self.saveBtn.setToolTip("حفظ")
