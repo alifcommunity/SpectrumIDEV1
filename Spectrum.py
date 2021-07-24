@@ -371,40 +371,43 @@ class Ui_MainWin(object):
         start_time = time.time()
         code = self.code.toPlainText()
 
-        with open(fileDir + r"\temp.alif", "w", encoding="utf-8") as tempFile:
+        with open(fileDir + r"/temp.alif", "w", encoding="utf-8") as tempFile:
             tempFile.write(code)
             tempFile.close()
 
-        commandALIF = fileDir + r"\temp.alif"
-        if os.path.exists(r"Temp\temp.exe"):
-            os.remove(r"Temp\temp.exe")
+        commandALIF = fileDir + r"/temp.alif"
+        if os.path.exists(r"Temp/temp.exe"):
+            os.remove(r"Temp/temp.exe")
             res = os.system("alif " + commandALIF)
         else:
             res = os.system("alif " + commandALIF)
 
         if res == 0:
-            commandEXE = fileDir + r"\temp.exe"
-            os.system(commandEXE)
-            process = subprocess.Popen("temp.exe", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            if sys.platform == "linux":
+                process = subprocess.Popen(["./temp"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                        universal_newlines=True, encoding="utf-8", cwd=fileDir)
+            else:
+                process = subprocess.Popen(["temp.exe"], shell=True, stdout=subprocess.PIPE,
+                                           stderr=subprocess.PIPE,
+                                           universal_newlines=True, encoding="utf-8", cwd=fileDir)
             rc = process.wait()
             out, err = process.communicate()
             process_time = round(time.time() - start_time, 5)
             self.result.setText(f"{out}\n{err}\n\n [انتهى التنفيذ خلال: {process_time} ثانية]\n")
         else:
             try:
-                log = fileDir + r"\temp.alif.log"
+                log = fileDir + r"/temp.alif.log"
                 log_open = open(log, "r", encoding="utf-8")
                 self.result.setText(log_open.read())
                 log_open.close()
             except:
-                print("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح لديك")
+                self.result.setText("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح لديك")
 
     def retranslateUi(self, MainWin):
         _translate = QCoreApplication.translate
         MainWin.setWindowTitle(_translate("MainWin", "MainWindow"))
         self.title.setText(_translate("MainWin", "طيف"))
-        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.2.0"))
+        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.2.1"))
         self.newBtn.setToolTip("جديد")
         self.openBtn.setToolTip("فتح")
         self.saveBtn.setToolTip("حفظ")
