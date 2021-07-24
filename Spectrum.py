@@ -383,10 +383,13 @@ class Ui_MainWin(object):
             res = os.system("alif " + commandALIF)
 
         if res == 0:
-            # commandEXE = fileDir + r"/temp.exe"
-            # os.system(commandEXE)
-            process = subprocess.Popen(["temp.exe","./temp"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            if sys.platform == "linux":
+                process = subprocess.Popen(["./temp"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                        universal_newlines=True, encoding="utf-8", cwd=fileDir)
+            else:
+                process = subprocess.Popen(["temp.exe"], shell=True, stdout=subprocess.PIPE,
+                                           stderr=subprocess.PIPE,
+                                           universal_newlines=True, encoding="utf-8", cwd=fileDir)
             rc = process.wait()
             out, err = process.communicate()
             process_time = round(time.time() - start_time, 5)
@@ -398,7 +401,7 @@ class Ui_MainWin(object):
                 self.result.setText(log_open.read())
                 log_open.close()
             except:
-                print("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح لديك")
+                self.result.setText("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح لديك")
 
     def retranslateUi(self, MainWin):
         _translate = QCoreApplication.translate
