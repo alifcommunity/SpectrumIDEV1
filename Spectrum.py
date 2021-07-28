@@ -84,7 +84,7 @@ class CodeEditor(QPlainTextEdit):
 class Ui_MainWin(object):
 
     def setupUi(self, MainWin):
-        MainWin.setGeometry(600, 300, 1800, 900)
+        MainWin.setGeometry(0, 0, 1280, 720)
         MainWin.setMinimumSize(QSize(900, 500))
         MainWin.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
@@ -307,6 +307,8 @@ class Ui_MainWin(object):
 
     def mouseMoveEvent(self, QMouseEvent):
         if MainWin.isMaximized():
+            self.maximizeBtn.setIcon(QIcon("./icons/Maximize.png"))
+            self.mainwind.setStyleSheet("background-color: \"#1c1d20\";border-radius: 10px")
             MainWin.showNormal()
         if Qt.MouseButton.LeftButton and self.m_flag:
             MainWin.move(QPointF.toPoint(QMouseEvent.globalPosition()) - MainWin.m_Position)
@@ -318,9 +320,11 @@ class Ui_MainWin(object):
         if MainWin.isMaximized():
             self.maximizeBtn.setIcon(QIcon("./icons/Maximize.png"))
             MainWin.showNormal()
+            self.mainwind.setStyleSheet("background-color: \"#1c1d20\";border-radius: 10px")
         else:
             self.maximizeBtn.setIcon(QIcon("./icons/Restore.png"))
             MainWin.showMaximized()
+            self.mainwind.setStyleSheet("background-color: #1c1d20")
 
     def new(self):
         self.save()
@@ -371,13 +375,13 @@ class Ui_MainWin(object):
         start_time = time.time()
         code = self.code.toPlainText()
 
-        with open(fileDir + r"/temp.alif", "w", encoding="utf-8") as tempFile:
+        with open(os.path.join(fileDir, "temp.alif"), "w", encoding="utf-8") as tempFile:
             tempFile.write(code)
             tempFile.close()
 
-        commandALIF = fileDir + r"/temp.alif"
-        if os.path.exists(r"Temp/temp.exe"):
-            os.remove(r"Temp/temp.exe")
+        commandALIF = os.path.join(fileDir, "temp.alif")
+        if os.path.exists("Temp/temp.exe"):
+            os.remove("Temp/temp.exe")
             res = os.system("alif " + commandALIF)
         else:
             res = os.system("alif " + commandALIF)
@@ -390,24 +394,24 @@ class Ui_MainWin(object):
                 process = subprocess.Popen(["temp.exe"], shell=True, stdout=subprocess.PIPE,
                                            stderr=subprocess.PIPE,
                                            universal_newlines=True, encoding="utf-8", cwd=fileDir)
-            rc = process.wait()
+            # rc = process.wait()
             out, err = process.communicate()
             process_time = round(time.time() - start_time, 5)
             self.result.setText(f"{out}\n{err}\n\n [انتهى التنفيذ خلال: {process_time} ثانية]\n")
         else:
             try:
-                log = fileDir + r"/temp.alif.log"
+                log = os.path.join(fileDir, "temp.alif.log")
                 log_open = open(log, "r", encoding="utf-8")
                 self.result.setText(log_open.read())
                 log_open.close()
             except:
-                self.result.setText("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح لديك")
+                self.result.setText("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح")
 
     def retranslateUi(self, MainWin):
         _translate = QCoreApplication.translate
         MainWin.setWindowTitle(_translate("MainWin", "MainWindow"))
         self.title.setText(_translate("MainWin", "طيف"))
-        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.2.1"))
+        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.2.2"))
         self.newBtn.setToolTip("جديد")
         self.openBtn.setToolTip("فتح")
         self.saveBtn.setToolTip("حفظ")
