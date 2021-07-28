@@ -2,11 +2,11 @@ from PyQt6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QHBoxLayo
 from PyQt6.QtCore import QSize, Qt, QMetaObject, QCoreApplication, QPointF, QRect
 from PyQt6.QtGui import QIcon, QPixmap, QColor, QPainter
 from PyQt6 import sip
+import alif_syn_pars
 import subprocess
+import time
 import sys
 import os
-import time
-import alif_syn_pars
 
 #######################################################################################################################
 
@@ -34,6 +34,13 @@ class CodeEditor(QPlainTextEdit):
         self.document().setDefaultTextOption(txtOpt)
         self.setStyleSheet("background-color: rgb(39, 41, 45);color: rgb(255, 255, 255);font: 12pt \"Tajawal\";border : 30px;border-radius: 10px;border-color: rgb(255, 255, 255); padding: 6px;")
         self.setTabStopDistance(16)
+        self.openExample()
+
+    def openExample(self):
+        with open("./Example/Add.alif", "r", encoding="utf-8") as example:
+            example_read = example.read()
+            self.setPlainText(example_read)
+            example.close()
 
     def lineNumberAreaWidth(self):
         digits = 1
@@ -101,7 +108,6 @@ class Ui_MainWin(object):
         self.topbarfrm.setStyleSheet("background-color: \"#1c1d20\";")
         self.topbarfrm.mousePressEvent = self.mousePressEvent
         self.topbarfrm.mouseMoveEvent = self.mouseMoveEvent
-        self.topbarfrm.mouseReleaseEvent = self.mouseReleaseEvent
 
         self.hTopBarfrmLay = QHBoxLayout(self.topbarfrm)
         self.hTopBarfrmLay.setContentsMargins(3, 0, 3, 0)
@@ -301,20 +307,17 @@ class Ui_MainWin(object):
 #######################################################################################################################
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.m_flag = True
-            MainWin.m_Position = QPointF.toPoint(event.globalPosition()) - MainWin.pos()
+        self.oldPos = event.globalPosition()
 
-    def mouseMoveEvent(self, QMouseEvent):
+    def mouseMoveEvent(self, event):
         if MainWin.isMaximized():
             self.maximizeBtn.setIcon(QIcon("./icons/Maximize.png"))
             self.mainwind.setStyleSheet("background-color: \"#1c1d20\";border-radius: 10px")
             MainWin.showNormal()
-        if Qt.MouseButton.LeftButton and self.m_flag:
-            MainWin.move(QPointF.toPoint(QMouseEvent.globalPosition()) - MainWin.m_Position)
-
-    def mouseReleaseEvent(self, QMouseEvent):
-        self.m_flag = False
+            self.oldPos = QPointF(MainWin.pos()) + QPointF(640.0, 25.0)
+        delta = QPointF.toPoint(event.globalPosition() - self.oldPos)
+        MainWin.move(MainWin.x() + delta.x(), MainWin.y() + delta.y())
+        self.oldPos = event.globalPosition()
 
     def restore(self):
         if MainWin.isMaximized():
@@ -411,7 +414,7 @@ class Ui_MainWin(object):
         _translate = QCoreApplication.translate
         MainWin.setWindowTitle(_translate("MainWin", "MainWindow"))
         self.title.setText(_translate("MainWin", "طيف"))
-        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.2.2"))
+        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.2.3"))
         self.newBtn.setToolTip("جديد")
         self.openBtn.setToolTip("فتح")
         self.saveBtn.setToolTip("حفظ")
