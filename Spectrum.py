@@ -255,7 +255,6 @@ class MainWin(QMainWindow):
         self.hMainFrmLay.addWidget(self.codeFrm)
         self.vMainWidLay.addWidget(self.mainFrm)
         self.vMainWidLay.addWidget(self.statusBar)
-        self.vMainWinLay.addWidget(self.mainWid)
         self.setCentralWidget(self.mainWid)
 
 #################################################### تعريف المتغيرات ###################################################
@@ -263,7 +262,7 @@ class MainWin(QMainWindow):
         self.fileOpened = False
         self.fileSaved = False
         self.fileName = None
-        self.processRuned = False
+        self.isProcess = False
         self.res = 1
 
 ################################################ تعريف الوظائف الرئيسية ################################################
@@ -395,7 +394,7 @@ class MainWin(QMainWindow):
                 self.process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
                 self.process.readyRead.connect(self.ifReadReady)
                 self.process.start(os.path.join(self.tempFile, "temp.exe"))
-            self.processRuned = True
+            self.isProcess = True
         else:
             self.result.setPlainText("قم ببناء الشفرة أولاً")
 
@@ -411,7 +410,7 @@ class MainWin(QMainWindow):
         self.cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.KeepAnchor)
         self.input = self.cursor.selectedText() + "\n"
         if event.key() == Qt.Key.Key_Return:
-            if self.processRuned:
+            if self.isProcess:
                 self.process.write(self.input.encode())
             print(self.input)
         QPlainTextEdit.keyPressEvent(self.result, event)

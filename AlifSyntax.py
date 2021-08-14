@@ -82,7 +82,7 @@ class PythonHighlighter(QSyntaxHighlighter):
 
         rules += [('#%s($|[^\u0621-\u064A[^0-9]]*)' % l, 0, STYLES['library'])
                   for l in PythonHighlighter.library]
-        rules += [('(%(0)s)($|[^\u0621-\u064A[^0-9]]*)' % {'0': w}, 0, STYLES['keyword'])
+        rules += [('(^%(0)s|[\t| ]+%(0)s)($|[^\u0621-\u064A[^0-9]]*)' % {'0': w}, 0, STYLES['keyword'])
                   for w in PythonHighlighter.keywords]
         rules += [('%s' % o, 0, STYLES['operator'])
                   for o in PythonHighlighter.operators]

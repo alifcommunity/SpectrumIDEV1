@@ -66,7 +66,7 @@ class CodeEditor(QPlainTextEdit):
             if block.isVisible() and (bottom >= event.rect().top()):
                 number = str(blockNumber + 1)
                 painter.setPen(QColor("#BABABA"))
-                painter.drawText(0, int(top), self.lineNumberArea.width(), height, Qt.AlignmentFlag.AlignCenter, number)
+                painter.drawText(0, int(top), self.lineNumberArea.width(), height, Qt.AlignmentFlag.AlignRight, number)
 
             block = block.next()
             top = bottom
