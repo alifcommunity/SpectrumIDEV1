@@ -1,9 +1,9 @@
 <div dir="rtl">
  
-#محرر طيف | Spectrum IDE
+# محرر طيف | Spectrum IDE
 بيئة تطوير لغة ألف 3
 
- ![](SpectrumUI.png)
+![SpectrumUI](https://user-images.githubusercontent.com/77246874/129458934-1bd6166e-9f30-445e-ab9b-9a9b6e7b1d21.png)
 
 طريقة التتبيث 
  
