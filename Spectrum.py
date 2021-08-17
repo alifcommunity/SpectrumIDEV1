@@ -1,434 +1,430 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QFrame, QTextEdit, QApplication, QSizeGrip, QFileDialog, QPlainTextEdit
-from PyQt6.QtCore import QSize, Qt, QMetaObject, QCoreApplication, QPointF, QRect
-from PyQt6.QtGui import QIcon, QPixmap, QColor, QPainter
+from PyQt6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QFrame, QApplication, QSizeGrip, QFileDialog, QPlainTextEdit
+from PyQt6.QtCore import QSize, Qt, QPointF, QProcess
+from PyQt6.QtGui import QIcon, QPixmap, QTextCursor
+from tempfile import gettempdir
 from PyQt6 import sip
-import alif_syn_pars
-import subprocess
+import CodeEditor
 import time
 import sys
 import os
 
-#######################################################################################################################
+################################################## تعريف الواجهة الرئيسية ##############################################
 
-class BarNum(QFrame):
-    def __init__(self, editor):
-        super().__init__(editor)
-        self.code = editor
+class MainWin(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setGeometry(0, 0, 1280, 720)
+        self.setMinimumSize(QSize(640, 360))
+        self.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
-    def sizeHint(self):
-        return QSize(self.editor.lineNumberAreaWidth(), 0)
+        self.vMainWinLay = QVBoxLayout(self)
+        self.vMainWinLay.setContentsMargins(0, 0, 0, 0)
+        self.vMainWinLay.setSpacing(0)
 
-    def paintEvent(self, event):
-        self.code.PaintEvent(event)
+        self.mainWid = QWidget(self)
+        self.mainWid.setStyleSheet("background-color:#1c1d20; border-radius: 7px")
 
-class CodeEditor(QPlainTextEdit):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.lineNumberArea = BarNum(self)
-        self.blockCountChanged.connect(self.updateLineNumberAreaWidth)
-        self.updateRequest.connect(self.updateLineNumberArea)
-        self.highlight = alif_syn_pars.PythonHighlighter(self.document())
-        txtOpt = self.document().defaultTextOption()
-        txtOpt.setAlignment(Qt.AlignmentFlag.AlignRight)
-        txtOpt.setTextDirection(Qt.LayoutDirection.RightToLeft)
-        self.document().setDefaultTextOption(txtOpt)
-        self.setStyleSheet("background-color: rgb(39, 41, 45);color: rgb(255, 255, 255);font: 12pt \"Tajawal\";border : 30px;border-radius: 10px;border-color: rgb(255, 255, 255); padding: 6px;")
-        self.setTabStopDistance(16)
-        self.openExample()
+        self.vMainWidLay = QVBoxLayout(self.mainWid)
+        self.vMainWidLay.setContentsMargins(0, 0, 0, 0)
+        self.vMainWidLay.setSpacing(0)
 
-    def openExample(self):
-        with open("./Example/Add.alif", "r", encoding="utf-8") as example:
-            example_read = example.read()
-            self.setPlainText(example_read)
-            example.close()
+        self.topBarFrm = QFrame(self.mainWid)
+        self.topBarFrm.setStyleSheet("background-color: #1c1d20;")
+        self.topBarFrm.setFixedHeight(45)
+        self.topBarFrm.mousePressEvent = self.mousePress
+        self.topBarFrm.mouseMoveEvent = self.mouseMove
+        self.topBarFrm.mouseReleaseEvent = self.mouseRelese
 
-    def lineNumberAreaWidth(self):
-        digits = 1
-        max_value = max(1, self.document().blockCount())
-        while max_value >= 10:
-            max_value /= 10
-            digits += 1
-        space = 3 + self.fontMetrics().horizontalAdvance('9') * digits
-        return space
+        self.hTopBarFrmLay = QHBoxLayout(self.topBarFrm)
+        self.hTopBarFrmLay.setContentsMargins(3, 0, 3, 0)
+        self.hTopBarFrmLay.setSpacing(0)
 
-    def updateLineNumberAreaWidth(self, _):
-        self.setViewportMargins(0, 0, self.lineNumberAreaWidth() + 20, 0)
+        self.logoFrm = QFrame(self.topBarFrm)
+        self.logoFrm.setFixedWidth(90)
 
-    def updateLineNumberArea(self, rect, dy):
-        if dy:
-            self.lineNumberArea.scroll(0, dy)
-        else:
-            self.lineNumberArea.update(0, rect.y(), self.lineNumberAreaWidth(), rect.height())
-        if rect.contains(self.viewport().rect()):
-            self.updateLineNumberAreaWidth(0)
+        self.hLogoFrmLay = QHBoxLayout(self.logoFrm)
+        self.hLogoFrmLay.setContentsMargins(43, 1, 0, 0)
+        self.hLogoFrmLay.setSpacing(0)
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        cr = self.contentsRect()
-        self.lineNumberArea.setGeometry(QRect(cr.right() - self.lineNumberAreaWidth() - 3, cr.top(), self.lineNumberAreaWidth(), cr.height()))
-
-    def PaintEvent(self, event):
-        painter = QPainter(self.lineNumberArea)
-
-        block = self.firstVisibleBlock()
-        blockNumber = block.blockNumber()
-        top = self.blockBoundingGeometry(block).translated(self.contentOffset()).top()
-        bottom = top + self.blockBoundingRect(block).height()
-
-        height = self.fontMetrics().height()
-        while block.isValid() and (top <= event.rect().bottom()):
-            if block.isVisible() and (bottom >= event.rect().top()):
-                number = str(blockNumber + 1)
-                painter.setPen(QColor("#BABABA"))
-                painter.drawText(0, int(top), self.lineNumberArea.width(), height, Qt.AlignmentFlag.AlignCenter, number)
-
-            block = block.next()
-            top = bottom
-            bottom = top + self.blockBoundingRect(block).height()
-            blockNumber += 1
-
-
-class Ui_MainWin(object):
-
-    def setupUi(self, MainWin):
-        MainWin.setGeometry(0, 0, 1280, 720)
-        MainWin.setMinimumSize(QSize(900, 500))
-        MainWin.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-
-        self.mainwind = QWidget(MainWin)
-        self.mainwind.setStyleSheet("background-color: \"#1c1d20\";border-radius: 10px")
-
-        self.vMainWindLay = QVBoxLayout(self.mainwind)
-        self.vMainWindLay.setContentsMargins(0, 0, 0, 0)
-        self.vMainWindLay.setSpacing(0)
-
-        self.topbarfrm = QFrame(self.mainwind)
-        self.topbarfrm.setMinimumHeight(45)
-        self.topbarfrm.setMaximumHeight(45)
-        self.topbarfrm.setStyleSheet("background-color: \"#1c1d20\";")
-        self.topbarfrm.mousePressEvent = self.mousePressEvent
-        self.topbarfrm.mouseMoveEvent = self.mouseMoveEvent
-
-        self.hTopBarfrmLay = QHBoxLayout(self.topbarfrm)
-        self.hTopBarfrmLay.setContentsMargins(3, 0, 3, 0)
-        self.hTopBarfrmLay.setSpacing(0)
-
-        self.logofrm = QFrame(self.topbarfrm)
-        self.logofrm.setMaximumWidth(90)
-
-        self.hLogofrmLay = QHBoxLayout(self.logofrm)
-        self.hLogofrmLay.setContentsMargins(43, 3, 0, 0)
-        self.hLogofrmLay.setSpacing(0)
-
-        self.alifBtn = QPushButton(self.logofrm)
+        self.alifBtn = QPushButton(self.logoFrm)
         self.alifBtn.setFixedHeight(40)
         self.alifBtn.setFixedWidth(40)
-        self.alifBtn.setStyleSheet("background-color: \"#1c1d20\";border: 0px")
-        self.alifBtn.setIcon(QIcon("./icons/Alif.ico"))
-        self.alifBtn.setIconSize(QSize(25, 25))
+        self.alifBtn.setStyleSheet("background-color: #1c1d20;border: 0px")
+        self.alifBtn.setIcon(QIcon("./icons/TaifLogo.svg"))
+        self.alifBtn.setIconSize(QSize(30, 30))
 
-        self.hLogofrmLay.addWidget(self.alifBtn)
-        self.hTopBarfrmLay.addWidget(self.logofrm)
+        self.hLogoFrmLay.addWidget(self.alifBtn)
+        self.hTopBarFrmLay.addWidget(self.logoFrm)
 
-        self.titlefrm = QFrame(self.topbarfrm)
+        self.titleFrm = QFrame(self.topBarFrm)
 
-        self.hTitlefrmLay = QHBoxLayout(self.titlefrm)
-        self.hTitlefrmLay.setContentsMargins(0, 0, 0, 0)
-        self.hTitlefrmLay.setSpacing(0)
+        self.hTitleFrmLay = QHBoxLayout(self.titleFrm)
+        self.hTitleFrmLay.setContentsMargins(0, 0, 0, 0)
+        self.hTitleFrmLay.setSpacing(0)
 
-        self.title = QLabel(self.titlefrm)
-        self.title.setStyleSheet("font: 11pt \"Tajawal\";color: \"#fff\"")
+        self.title = QLabel(self.titleFrm)
+        self.title.setText("جمع.alif")
+        self.title.setStyleSheet("font: 12pt Tajawal; color:#fff;")
         self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.hTitlefrmLay.addWidget(self.title)
-        self.hTopBarfrmLay.addWidget(self.titlefrm)
+        self.hTitleFrmLay.addWidget(self.title)
+        self.hTopBarFrmLay.addWidget(self.titleFrm)
 
-        self.controlwinfrm = QFrame(self.topbarfrm)
-        self.controlwinfrm.setMaximumWidth(90)
+        self.controlWinFrm = QFrame(self.topBarFrm)
+        self.controlWinFrm.setFixedWidth(90)
 
-        self.hControlWinfrmLay = QHBoxLayout(self.controlwinfrm)
-        self.hControlWinfrmLay.setContentsMargins(0, 0, 0, 0)
-        self.hControlWinfrmLay.setSpacing(0)
+        self.hControlWinFrmLay = QHBoxLayout(self.controlWinFrm)
+        self.hControlWinFrmLay.setContentsMargins(0, 0, 0, 0)
+        self.hControlWinFrmLay.setSpacing(0)
 
-        self.minimizeBtn = QPushButton(self.controlwinfrm)
+        self.minimizeBtn = QPushButton(self.controlWinFrm)
+        self.minimizeBtn.setStyleSheet("QPushButton{background-color: #1c1d20; border-radius: 3px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.minimizeBtn.setFixedHeight(25)
         self.minimizeBtn.setFixedWidth(25)
-        self.minimizeBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";border: 0px;border-radius: 3px;}QPushButton:hover{background-color:  rgb(73, 85, 255);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.minimizeBtn.setIcon(QIcon("./icons/Minimize.png"))
+        self.minimizeBtn.setIcon(QIcon("./icons/Minimize.svg"))
         self.minimizeBtn.setIconSize(QSize(13, 13))
-        self.minimizeBtn.clicked.connect(MainWin.showMinimized)
+        self.minimizeBtn.clicked.connect(self.showMinimized)
 
-        self.hControlWinfrmLay.addWidget(self.minimizeBtn)
+        self.hControlWinFrmLay.addWidget(self.minimizeBtn)
 
-        self.maximizeBtn = QPushButton(self.controlwinfrm)
+        self.maximizeBtn = QPushButton(self.controlWinFrm)
+        self.maximizeBtn.setStyleSheet("QPushButton{background-color: #1c1d20; border-radius: 3px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.maximizeBtn.setFixedWidth(25)
         self.maximizeBtn.setFixedHeight(25)
-        self.maximizeBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";border: 0px;border-radius: 3px;}QPushButton:hover{background-color:  rgb(73, 85, 255);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.maximizeBtn.setIcon(QIcon("./icons/Maximize.png"))
+        self.maximizeBtn.setIcon(QIcon("./icons/Maximize.svg"))
         self.maximizeBtn.setIconSize(QSize(13, 13))
-        self.maximizeBtn.clicked.connect(self.restore)
+        self.maximizeBtn.clicked.connect(self.winRestore)
 
-        self.hControlWinfrmLay.addWidget(self.maximizeBtn)
+        self.hControlWinFrmLay.addWidget(self.maximizeBtn)
 
-        self.closeBtn = QPushButton(self.controlwinfrm)
+        self.closeBtn = QPushButton(self.controlWinFrm)
+        self.closeBtn.setStyleSheet("QPushButton{background-color: #1c1d20; border-radius: 3px;}QPushButton:hover{background-color: #DA0000;}QPushButton:pressed{background-color: #323AAF;}")
         self.closeBtn.setFixedHeight(25)
         self.closeBtn.setFixedWidth(25)
-        self.closeBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";border: 0px;border-radius: 3px;}QPushButton:hover{background-color: rgb(218, 0, 0);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.closeBtn.setIcon(QIcon("./icons/Close.png"))
+        self.closeBtn.setIcon(QIcon("./icons/Close.svg"))
         self.closeBtn.setIconSize(QSize(13, 13))
-        self.closeBtn.clicked.connect(MainWin.close)
+        self.closeBtn.clicked.connect(self.close)
 
-        self.hControlWinfrmLay.addWidget(self.closeBtn)
-        self.hTopBarfrmLay.addWidget(self.controlwinfrm)
-        self.vMainWindLay.addWidget(self.topbarfrm)
+        self.hControlWinFrmLay.addWidget(self.closeBtn)
+        self.hTopBarFrmLay.addWidget(self.controlWinFrm)
+        self.vMainWidLay.addWidget(self.topBarFrm)
 
-        self.mainfrm = QFrame(self.mainwind)
-        self.mainfrm.setStyleSheet("background-color: \"#1c1d20\";")
+        self.mainFrm = QFrame(self.mainWid)
+        self.mainFrm.setStyleSheet("background-color: #1c1d20;")
 
-        self.hMainfrmLay = QHBoxLayout(self.mainfrm)
-        self.hMainfrmLay.setContentsMargins(0, 0, 0, 0)
-        self.hMainfrmLay.setSpacing(0)
+        self.hMainFrmLay = QHBoxLayout(self.mainFrm)
+        self.hMainFrmLay.setContentsMargins(0, 0, 0, 0)
+        self.hMainFrmLay.setSpacing(0)
 
-        self.menufrm = QFrame(self.mainfrm)
-        self.menufrm.setFixedWidth(50)
-        self.menufrm.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-        self.menufrm.setStyleSheet("background-color: \"#1c1d20\";")
+        self.menuFrm = QFrame(self.mainFrm)
+        self.menuFrm.setStyleSheet("background-color: #1c1d20;")
+        self.menuFrm.setFixedWidth(50)
+        self.menuFrm.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
-        self.vMenufrmLay = QVBoxLayout(self.menufrm)
-        self.vMenufrmLay.setContentsMargins(0, 3, 0, 30)
-        self.vMenufrmLay.setSpacing(0)
+        self.vMenuFrmLay = QVBoxLayout(self.menuFrm)
+        self.vMenuFrmLay.setContentsMargins(0, 3, 0, 0)
+        self.vMenuFrmLay.setSpacing(0)
 
-        self.topbtnsfrm = QFrame(self.menufrm)
+        self.topBtnsFrm = QFrame(self.menuFrm)
 
-        self.vTopBtnsfrmLay = QVBoxLayout(self.topbtnsfrm)
-        self.vTopBtnsfrmLay.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.vTopBtnsfrmLay.setContentsMargins(0, 0, 5, 0)
-        self.vTopBtnsfrmLay.setSpacing(6)
+        self.vTopBtnsFrmLay = QVBoxLayout(self.topBtnsFrm)
+        self.vTopBtnsFrmLay.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.vTopBtnsFrmLay.setContentsMargins(0, 0, 5, 0)
+        self.vTopBtnsFrmLay.setSpacing(6)
 
-        self.newBtn = QPushButton(self.topbtnsfrm)
+        self.newBtn = QPushButton(self.topBtnsFrm)
+        self.newBtn.setToolTip("جديد")
+        self.newBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: #fff; border-radius: 7px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.newBtn.setFixedWidth(40)
         self.newBtn.setFixedHeight(40)
-        self.newBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";color: rgb(255, 255, 255);border: 0px;border-radius: 6px;}QPushButton:hover{background-color:  rgb(73, 85, 255);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.newBtn.setIcon(QIcon("./icons/New.png"))
+        self.newBtn.setIcon(QIcon("./icons/New.svg"))
         self.newBtn.setIconSize(QSize(25, 25))
-        self.newBtn.clicked.connect(self.new)
+        self.newBtn.clicked.connect(self.newFile)
 
-        self.vTopBtnsfrmLay.addWidget(self.newBtn)
+        self.vTopBtnsFrmLay.addWidget(self.newBtn)
 
-        self.openBtn = QPushButton(self.topbtnsfrm)
+        self.openBtn = QPushButton(self.topBtnsFrm)
+        self.openBtn.setToolTip("فتح")
+        self.openBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: #fff; border-radius: 7px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.openBtn.setFixedWidth(40)
         self.openBtn.setFixedHeight(40)
-        self.openBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";color: rgb(255, 255, 255);border: 0px;border-radius: 6px;}QPushButton:hover{background-color:  rgb(73, 85, 255);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.openBtn.setIcon(QIcon("./icons/Open.png"))
+        self.openBtn.setIcon(QIcon("./icons/Open.svg"))
         self.openBtn.setIconSize(QSize(25, 25))
-        self.openBtn.clicked.connect(self.open)
+        self.openBtn.clicked.connect(self.openFile)
 
-        self.vTopBtnsfrmLay.addWidget(self.openBtn)
+        self.vTopBtnsFrmLay.addWidget(self.openBtn)
 
-        self.saveBtn = QPushButton(self.topbtnsfrm)
+        self.saveBtn = QPushButton(self.topBtnsFrm)
+        self.saveBtn.setToolTip("حفظ")
+        self.saveBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: rgb(255, 255, 255); border-radius: 7px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.saveBtn.setFixedHeight(40)
         self.saveBtn.setFixedWidth(40)
-        self.saveBtn.setStyleSheet("QPushButton{background-color: \"#1c1d20\";color: rgb(255, 255, 255);border: 0px;border-radius: 6px;}QPushButton:hover{background-color:  rgb(73, 85, 255);}QPushButton:pressed{background-color: rgb(50, 58, 175);}")
-        self.saveBtn.setIcon(QIcon("./icons/Save.png"))
+        self.saveBtn.setIcon(QIcon("./icons/Save.svg"))
         self.saveBtn.setIconSize(QSize(25, 25))
-        self.saveBtn.clicked.connect(self.save)
+        self.saveBtn.clicked.connect(self.saveFile)
 
-        self.vTopBtnsfrmLay.addWidget(self.saveBtn)
-        self.vMenufrmLay.addWidget(self.topbtnsfrm)
+        self.vTopBtnsFrmLay.addWidget(self.saveBtn)
 
-        self.runbtnfrm = QFrame(self.menufrm)
+        self.saveAsBtn = QPushButton(self.topBtnsFrm)
+        self.saveAsBtn.setToolTip("حفظ كـ")
+        self.saveAsBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: rgb(255, 255, 255); border-radius: 7px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
+        self.saveAsBtn.setFixedHeight(40)
+        self.saveAsBtn.setFixedWidth(40)
+        self.saveAsBtn.setIcon(QIcon("./icons/SaveAs.svg"))
+        self.saveAsBtn.setIconSize(QSize(25, 25))
+        self.saveAsBtn.clicked.connect(self.saveFileAs)
 
-        self.vRunBtnfrmLay = QVBoxLayout(self.runbtnfrm)
-        self.vRunBtnfrmLay.setContentsMargins(0, 0, 5, 3)
-        self.vRunBtnfrmLay.setSpacing(0)
+        self.vTopBtnsFrmLay.addWidget(self.saveAsBtn)
+        self.vMenuFrmLay.addWidget(self.topBtnsFrm)
 
-        self.runBtn = QPushButton(self.runbtnfrm)
+        self.runBtnFrm = QFrame(self.menuFrm)
+
+        self.vRunBtnFrmLay = QVBoxLayout(self.runBtnFrm)
+        self.vRunBtnFrmLay.setContentsMargins(0, 0, 5, 7)
+        self.vRunBtnFrmLay.setSpacing(6)
+
+        self.buildBtn = QPushButton(self.runBtnFrm)
+        self.buildBtn.setToolTip("بناء")
+        self.buildBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: rgb(255, 255, 255); border-radius: 7px;}QPushButton:hover{background-color: #FF5733;}QPushButton:pressed{background-color: #323AAF;}")
+        self.buildBtn.setFixedWidth(40)
+        self.buildBtn.setFixedHeight(40)
+        self.buildBtn.setIcon(QIcon("./icons/Build.svg"))
+        self.buildBtn.setIconSize(QSize(25, 25))
+        self.buildBtn.clicked.connect(self.codeBuild)
+
+        self.runBtn = QPushButton(self.runBtnFrm)
+        self.runBtn.setToolTip("تشغيل")
+        self.runBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: rgb(255, 255, 255); border-radius: 7px;}QPushButton:hover{background-color: #F6FF43;}QPushButton:pressed{background-color: #DFE300;}")
         self.runBtn.setFixedWidth(40)
         self.runBtn.setFixedHeight(40)
-        self.runBtn.setStyleSheet("QPushButton{background-color:\"#1c1d20\";color: rgb(255, 255, 255);border: 0px;border-radius: 6px;}QPushButton:hover{background-color:rgb(246, 255, 67);}QPushButton:pressed{background-color: rgb(223, 227, 0);}")
-        self.runBtn.setIcon(QIcon("./icons/Run.png"))
+        self.runBtn.setIcon(QIcon("./icons/Run.svg"))
         self.runBtn.setIconSize(QSize(25, 25))
-        self.runBtn.clicked.connect(self.run)
+        self.runBtn.clicked.connect(self.runCode)
 
-        self.vRunBtnfrmLay.addWidget(self.runBtn)
-        self.vRunBtnfrmLay.setAlignment(Qt.AlignmentFlag.AlignBottom)
-        self.vMenufrmLay.addWidget(self.runbtnfrm)
-        self.hMainfrmLay.addWidget(self.menufrm)
+        self.vRunBtnFrmLay.addWidget(self.buildBtn)
+        self.vRunBtnFrmLay.addWidget(self.runBtn)
+        self.vRunBtnFrmLay.setAlignment(Qt.AlignmentFlag.AlignBottom)
+        self.vMenuFrmLay.addWidget(self.runBtnFrm)
+        self.hMainFrmLay.addWidget(self.menuFrm)
 
-        self.codefrm = QFrame(self.mainfrm)
+        self.codeFrm = QFrame(self.mainFrm)
 
-        self.vCodefrmLay = QVBoxLayout(self.codefrm)
-        self.vCodefrmLay.setContentsMargins(6, 0, 0, 6)
+        self.vCodeFrmLay = QVBoxLayout(self.codeFrm)
+        self.vCodeFrmLay.setContentsMargins(6, 0, 0, 6)
 
-        self.code = CodeEditor(self.codefrm)
+        self.code = CodeEditor.CodeEditor(self.codeFrm)
 
-        self.vCodefrmLay.addWidget(self.code)
+        self.vCodeFrmLay.addWidget(self.code)
 
-        self.result = QTextEdit(self.codefrm)
+        self.result = QPlainTextEdit(self.codeFrm)
+        self.result.setStyleSheet("background-color: #0A0B0C; color: #fff; font: 11pt Tajawal; border-radius: 7px;")
+        self.resOpt = self.result.document().defaultTextOption()
+        self.resOpt.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.resOpt.setTextDirection(Qt.LayoutDirection.RightToLeft)
+        self.result.document().setDefaultTextOption(self.resOpt)
         self.result.setReadOnly(True)
-        self.result.setFixedHeight(150)
-        self.result.setStyleSheet("background-color:rgb(10, 11, 12);color: rgb(255, 255, 255);font: 12pt \"Tajawal\";border: 0px;border-radius: 10px;")
+        self.result.setFixedHeight(210)
+        self.result.appendPlainText(os.getcwd())
+        self.result.keyPressEvent = self.resutlReturn
 
-        self.vCodefrmLay.addWidget(self.result)
+        self.vCodeFrmLay.addWidget(self.result)
 
-        self.statusbar = QFrame(self.codefrm)
-        self.statusbar.setFixedHeight(20)
-        self.statusbar.setStyleSheet("background-color: rgb(28, 29, 32);border-radius: 10px;")
+        self.statusBar = QFrame(self.mainWid)
+        self.statusBar.setStyleSheet("background-color: #1c1d20; border-radius: 9px;")
+        self.statusBar.setFixedHeight(25)
 
-        self.horizontalLayout = QHBoxLayout(self.statusbar)
-        self.horizontalLayout.setContentsMargins(3, 0, 0, 0)
+        self.hStatusLay = QHBoxLayout(self.statusBar)
+        self.hStatusLay.setContentsMargins(6, 0, 0, 0)
 
-        self.statusLable = QLabel(self.statusbar)
-        self.statusLable.setStyleSheet("color: rgb(190, 190, 190);font: 9pt \"Tajawal\"")
+        self.statusLable = QLabel(self.statusBar)
+        self.statusLable.setText("بيئة تطوير لغة ألف 3 - نسخة 0.3.1")
+        self.statusLable.setStyleSheet("color: rgb(190, 190, 190); font: 9pt Tajawal")
         self.statusLable.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
-        self.horizontalLayout.addWidget(self.statusLable)
+        self.hStatusLay.addWidget(self.statusLable)
 
-        self.resizeGrip = QSizeGrip(self.statusbar)
+        self.resizeGrip = QSizeGrip(self.statusBar)
         self.resizeGrip.setFixedWidth(15)
         self.resizeGrip.setFixedHeight(15)
         self.resizeLable = QLabel(self.resizeGrip)
-        self.resizeLable.setPixmap(QPixmap("./icons/Resize.png"))
+        self.resizeLable.setPixmap(QPixmap("./icons/Resize.svg"))
 
-        self.horizontalLayout.addWidget(self.resizeGrip)
-        self.vCodefrmLay.addWidget(self.statusbar)
-        self.hMainfrmLay.addWidget(self.codefrm)
-        self.vMainWindLay.addWidget(self.mainfrm)
+        QFileDialog.setWindowIcon(self, QIcon("./icons/Alif.ico"))
 
-        MainWin.setCentralWidget(self.mainwind)
-        self.retranslateUi(MainWin)
-        QMetaObject.connectSlotsByName(MainWin)
+        self.hStatusLay.addWidget(self.resizeGrip)
+        self.hMainFrmLay.addWidget(self.codeFrm)
+        self.vMainWidLay.addWidget(self.mainFrm)
+        self.vMainWidLay.addWidget(self.statusBar)
+        self.setCentralWidget(self.mainWid)
 
-        QFileDialog.setWindowIcon(MainWin, QIcon("./icons/Alif.png"))
+#################################################### تعريف المتغيرات ###################################################
+
         self.fileOpened = False
         self.fileSaved = False
-        self.file_name = None
+        self.fileName = None
+        self.isProcess = False
+        self.res = 1
 
-#######################################################################################################################
+################################################ تعريف الوظائف الرئيسية ################################################
 
-    def mousePressEvent(self, event):
-        self.oldPos = event.globalPosition()
-
-    def mouseMoveEvent(self, event):
-        if MainWin.isMaximized():
-            self.maximizeBtn.setIcon(QIcon("./icons/Maximize.png"))
-            self.mainwind.setStyleSheet("background-color: \"#1c1d20\";border-radius: 10px")
-            MainWin.showNormal()
-            self.oldPos = QPointF(MainWin.pos()) + QPointF(640.0, 25.0)
-        delta = QPointF.toPoint(event.globalPosition() - self.oldPos)
-        MainWin.move(MainWin.x() + delta.x(), MainWin.y() + delta.y())
-        self.oldPos = event.globalPosition()
-
-    def restore(self):
-        if MainWin.isMaximized():
-            self.maximizeBtn.setIcon(QIcon("./icons/Maximize.png"))
-            MainWin.showNormal()
-            self.mainwind.setStyleSheet("background-color: \"#1c1d20\";border-radius: 10px")
+    def winRestore(self):
+        if self.isMaximized():
+            self.mainWid.setStyleSheet("background-color: #1c1d20; border-radius: 10px")
+            self.maximizeBtn.setIcon(QIcon("./icons/Maximize.svg"))
+            self.showNormal()
         else:
-            self.maximizeBtn.setIcon(QIcon("./icons/Restore.png"))
-            MainWin.showMaximized()
-            self.mainwind.setStyleSheet("background-color: #1c1d20")
+            self.maximizeBtn.setIcon(QIcon("./icons/Restore.svg"))
+            self.mainWid.setStyleSheet("background-color: #1c1d20")
+            self.showMaximized()
 
-    def new(self):
-        self.save()
-        self.code.clear()
-        self.result.clear()
-        self.fileOpened = False
-        self.fileSaved = False
-        self.file_name = None
+    def mousePress(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.pressedFlag = True
+            self.oldPos = event.globalPosition()
 
-    def open(self):
-        try:
-            self.file_name, _ = QFileDialog.getOpenFileName(MainWin, "فتح ملف ألف", "", "كل الملفات (*.alif)")
-            with open(self.file_name, "r", encoding="utf-8") as openFile:
-                fileCode = openFile.read()
-                self.code.setPlainText(fileCode)
-                openFile.close()
-            self.fileOpened = True
-        except:
-            pass
+    def mouseMove(self, event):
+        if self.pressedFlag:
+            if self.isMaximized():
+                self.maximizeBtn.setIcon(QIcon("./icons/Maximize.svg"))
+                self.mainWid.setStyleSheet("background-color: #1c1d20; border-radius: 10px")
+                self.showNormal()
+                self.oldPos = QPointF(self.pos()) + QPointF(640.0, 25.0)
+            delta = QPointF.toPoint(event.globalPosition() - self.oldPos)
+            self.move(self.x() + delta.x(), self.y() + delta.y())
+            self.oldPos = event.globalPosition()
 
-    def save(self):
-        try:
-            code = self.code.toPlainText()
-            if self.fileOpened:
-                with open(self.file_name, "w", encoding="utf-8") as saveFile:
-                    saveFile.write(code)
-                    saveFile.close()
-            elif self.fileSaved:
-                with open(self.file_name, "w", encoding="utf-8") as saveFile:
-                    saveFile.write(code)
-                    saveFile.close()
-            else:
-                self.file_name, _ = QFileDialog.getSaveFileName(MainWin, "حفظ ملف ألف", "غير معنون.alif", "ملف ألف (*.alif)")
-                with open(self.file_name, "w", encoding="utf-8") as saveFile:
-                    saveFile.write(code)
-                    saveFile.close()
-                self.fileSaved = True
-        except:
-            pass
+    def mouseRelese(self, event):
+        self.pressedFlag = False
 
-    def run(self):
-        fileDir = "Temp"
-        if not os.path.exists(fileDir):
-            os.mkdir(fileDir)
-        else:
-            pass
+    def isSaved(self):
+        if self.code.document().isModified() or self.fileName == None:
+            self.saveFile()
+        return True
 
-        start_time = time.time()
+    def newFile(self):
+        if self.isSaved():
+            self.code.clear()
+            self.result.clear()
+            self.fileOpened = False
+            self.fileSaved = False
+            self.fileName = None
+            self.title.setText("غير معنون.alif")
+
+    def saveFile(self):
         code = self.code.toPlainText()
-
-        with open(os.path.join(fileDir, "temp.alif"), "w", encoding="utf-8") as tempFile:
-            tempFile.write(code)
-            tempFile.close()
-
-        commandALIF = os.path.join(fileDir, "temp.alif")
-        if os.path.exists("Temp/temp.exe"):
-            os.remove("Temp/temp.exe")
-            res = os.system("alif " + commandALIF)
+        if self.fileOpened:
+            if self.fileName:
+                with open(self.fileName, "w", encoding="utf-8") as saveFile:
+                    saveFile.write(code)
+                    saveFile.close()
+        elif self.fileSaved:
+            if self.fileName:
+                with open(self.fileName, "w", encoding="utf-8") as saveFile:
+                    saveFile.write(code)
+                    saveFile.close()
         else:
-            res = os.system("alif " + commandALIF)
-
-        if res == 0:
-            if sys.platform == "linux":
-                process = subprocess.Popen(["./temp"], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                       universal_newlines=True, encoding="utf-8", cwd=fileDir)
+            self.fileName, _ = QFileDialog.getSaveFileName(self, "حفظ ملف ألف", "غير معنون.alif", "ملف ألف (*.alif)")
+            if self.fileName:
+                with open(self.fileName, "w", encoding="utf-8") as saveFile:
+                    saveFile.write(code)
+                    saveFile.close()
+                self.setWinTitle()
+                self.fileSaved = True
             else:
-                process = subprocess.Popen(["temp.exe"], shell=True, stdout=subprocess.PIPE,
-                                           stderr=subprocess.PIPE,
-                                           universal_newlines=True, encoding="utf-8", cwd=fileDir)
-            # rc = process.wait()
-            out, err = process.communicate()
-            process_time = round(time.time() - start_time, 5)
-            self.result.setText(f"{out}\n{err}\n\n [انتهى التنفيذ خلال: {process_time} ثانية]\n")
+                self.fileName = None
+
+    def saveFileAs(self):
+        code = self.code.toPlainText()
+        self.fileName, _ = QFileDialog.getSaveFileName(self, "حفظ ملف ألف", "غير معنون.alif", "ملف ألف (*.alif) ;; كل الملفات (*)")
+        if self.fileName:
+            with open(self.fileName, "w", encoding="utf-8") as saveFileAs:
+                saveFileAs.write(code)
+                saveFileAs.close()
+            self.setWinTitle()
         else:
+            self.fileName = None
+
+    def openFile(self):
+        if self.isSaved():
+            self.fileName, _ = QFileDialog.getOpenFileName(self, "فتح ملف ألف", "", "كل الملفات (*.alif)")
+            if self.fileName:
+                with open(self.fileName, "r", encoding="utf-8") as openFile:
+                    fileCode = openFile.read()
+                    self.code.setPlainText(fileCode)
+                    openFile.close()
+                self.setWinTitle()
+                self.fileOpened = True
+            else:
+                self.fileName = None
+
+    def codeBuild(self):
+        self.startTime = time.time()
+        code = self.code.toPlainText()
+        self.tempFile = gettempdir()
+
+        with open(os.path.join(self.tempFile, "temp.alif"), "w", encoding="utf-8") as temporaryFile:
+            temporaryFile.write(code)
+            temporaryFile.close()
+
+        if self.res == 0:
+            alifCom = os.path.join(self.tempFile, "temp.alif")
+            self.res = QProcess.execute("alif ", [alifCom])
+
+            buildTime = round(time.time() - self.startTime, 3)
+            self.result.appendPlainText(f"[انتهى البناء خلال: {buildTime} ثانية]")
+
+        if self.res == -2:
             try:
-                log = os.path.join(fileDir, "temp.alif.log")
+                log = os.path.join(self.tempFile, "temp.alif.log")
                 log_open = open(log, "r", encoding="utf-8")
-                self.result.setText(log_open.read())
+                self.result.setPlainText(log_open.read())
                 log_open.close()
             except:
-                self.result.setText("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح")
+                self.result.appendPlainText("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح")
 
-    def retranslateUi(self, MainWin):
-        _translate = QCoreApplication.translate
-        MainWin.setWindowTitle(_translate("MainWin", "MainWindow"))
-        self.title.setText(_translate("MainWin", "طيف"))
-        self.statusLable.setText(_translate("MainWin", "بيئة تطوير لغة ألف 3 - نسخة 0.2.3"))
-        self.newBtn.setToolTip("جديد")
-        self.openBtn.setToolTip("فتح")
-        self.saveBtn.setToolTip("حفظ")
-        self.runBtn.setToolTip("تشغيل")
+    def runCode(self):
+        self.startTime = time.time()
+        if self.res == 0:
+            if sys.platform == "linux":
+                self.process = QProcess()
+                self.process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
+                self.process.readyRead.connect(self.ifReadReady)
+                self.process.start(os.path.join(self.tempFile, "./temp"))
+            else:
+                self.process = QProcess()
+                self.process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
+                self.process.readyRead.connect(self.ifReadReady)
+                self.process.start(os.path.join(self.tempFile, "temp.exe"))
+            self.isProcess = True
+        else:
+            self.result.appendPlainText("قم ببناء الشفرة أولاً")
 
+    def ifReadReady(self):
+        self.result.setReadOnly(False)
+        self.result.appendPlainText(str(self.process.readAll(), "utf-8"))
+        runTime = round(time.time() - self.startTime, 3)
+        self.result.appendPlainText(f"\n[انتهى التنفيذ خلال: {runTime} ثانية]")
 
-#######################################################################################################################
+    def resutlReturn(self, event):
+        if event.key() == Qt.Key.Key_Return:
+            self.cursor = self.result.textCursor()
+            self.cursor.movePosition(QTextCursor.MoveOperation.StartOfLine)
+            self.cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.KeepAnchor)
+            self.input = self.cursor.selectedText() + "\n"
+            if self.isProcess:
+                self.process.write(self.input.encode())
+            print(self.input)
+        QPlainTextEdit.keyPressEvent(self.result, event)
+
+    def setWinTitle(self):
+        self.title.setText(self.fileName.split("/")[-1])
+
+################################################## دالة تشغيل التطبيق ##################################################
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    MainWin = QMainWindow()
-    ui = Ui_MainWin()
-    ui.setupUi(MainWin)
-    MainWin.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-    MainWin.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
-    MainWin.show()
+    mainWin = MainWin()
+    mainWin.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+    mainWin.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+    mainWin.show()
     sys.exit(app.exec())

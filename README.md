@@ -1,17 +1,16 @@
 <div dir="rtl">
  
-# Spectrum IDE
+# محرر طيف | Spectrum IDE
 بيئة تطوير لغة ألف 3
 
-![SpectrumUI](https://user-images.githubusercontent.com/77246874/126808904-435c0f11-d8c3-4575-8a2e-1f0237065061.png)
- 
-طريقة التتبيث 
+![SpectrumUI](https://user-images.githubusercontent.com/77246874/129458934-1bd6166e-9f30-445e-ab9b-9a9b6e7b1d21.png)
 
- اولا قم بتثبيت الخطوط المرفقة
+طريقة التتبيث 
  
- 
+اولا قم بتثبيت الخطوط المرفقة
+
 <div dir=ltr>
- 
+
 ```bash
 # استنساخ المشروع من جت هب
 git clone https://github.com/alifcommunity/SpectrumIDE
@@ -50,7 +49,7 @@ pip3 install -r requirements.txt
 <div dir=ltr>
  
 ```bash
-python3 Spectrum.py
+python Spectrum.py
 ```
 <div dir="rtl">
  
