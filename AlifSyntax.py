@@ -39,7 +39,7 @@ STYLES = {
 }
 
 
-class PythonHighlighter(QSyntaxHighlighter):
+class AlifHighlighter(QSyntaxHighlighter):
     library = [
         'ألف', 'مكتبة', 'نص'
     ]
@@ -70,7 +70,7 @@ class PythonHighlighter(QSyntaxHighlighter):
     ]
 
     def __init__(self, document):
-        QSyntaxHighlighter.__init__(self, document)
+        super(AlifHighlighter, self).__init__(document)
 
         rules = []
 
@@ -81,15 +81,15 @@ class PythonHighlighter(QSyntaxHighlighter):
         ]
 
         rules += [('#%s($|[^\u0621-\u064A[^0-9]]*)' % l, 0, STYLES['library'])
-                  for l in PythonHighlighter.library]
-        rules += [('(^%(0)s|[\t| ]+%(0)s)($|[^\u0621-\u064A[^0-9]]*)' % {'0': w}, 0, STYLES['keyword'])
-                  for w in PythonHighlighter.keywords]
+                  for l in AlifHighlighter.library]
+        rules += [('(?:%s)(?![\w\u0621-\u064A])' % w, 0, STYLES['keyword'])
+                  for w in AlifHighlighter.keywords]
         rules += [('%s' % o, 0, STYLES['operator'])
-                  for o in PythonHighlighter.operators]
+                  for o in AlifHighlighter.operators]
         rules += [('%s' % b, 0, STYLES['brace'])
-                  for b in PythonHighlighter.braces]
+                  for b in AlifHighlighter.braces]
         rules += [('%s' % i, 0, STYLES['injlang'])
-                  for i in PythonHighlighter.injlang]
+                  for i in AlifHighlighter.injlang]
 
         rules += [
             (r'--[^\n]*', 0, STYLES['comment']),
@@ -101,10 +101,10 @@ class PythonHighlighter(QSyntaxHighlighter):
 
     def highlightBlock(self, text):
         for expression, nth, format in self.rules:
-            matched = expression.match(text, 0)
+            match = expression.globalMatch(text, 0)
 
-            while matched.hasMatch():
-                index = matched.capturedStart(nth)
-                length = len(matched.captured(nth))
+            while match.hasNext():
+                matched = match.next()
+                index = matched.capturedStart()
+                length = matched.capturedLength()
                 self.setFormat(index, length, format)
-                matched = expression.match(text, index + length)

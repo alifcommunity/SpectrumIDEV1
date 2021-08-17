@@ -12,7 +12,7 @@ class CodeEditor(QPlainTextEdit):
         self.lineNumberArea = BarNum(self)
         self.blockCountChanged.connect(self.updateLineNumberAreaWidth)
         self.updateRequest.connect(self.updateLineNumberArea)
-        self.highlight = AlifSyntax.PythonHighlighter(self.document())
+        self.highlight = AlifSyntax.AlifHighlighter(self.document())
         codeOpt = self.document().defaultTextOption()
         codeOpt.setAlignment(Qt.AlignmentFlag.AlignRight)
         codeOpt.setTextDirection(Qt.LayoutDirection.RightToLeft)

@@ -237,7 +237,7 @@ class MainWin(QMainWindow):
         self.hStatusLay.setContentsMargins(6, 0, 0, 0)
 
         self.statusLable = QLabel(self.statusBar)
-        self.statusLable.setText("بيئة تطوير لغة ألف 3 - نسخة 0.3.0")
+        self.statusLable.setText("بيئة تطوير لغة ألف 3 - نسخة 0.3.1")
         self.statusLable.setStyleSheet("color: rgb(190, 190, 190); font: 9pt Tajawal")
         self.statusLable.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
@@ -366,20 +366,21 @@ class MainWin(QMainWindow):
             temporaryFile.write(code)
             temporaryFile.close()
 
-        alifCom = os.path.join(self.tempFile, "temp.alif")
-        self.res = QProcess.execute("alif ", [alifCom])
+        if self.res == 0:
+            alifCom = os.path.join(self.tempFile, "temp.alif")
+            self.res = QProcess.execute("alif ", [alifCom])
 
-        buildTime = round(time.time() - self.startTime, 3)
-        self.result.appendPlainText(f"[انتهى البناء خلال: {buildTime} ثانية]")
+            buildTime = round(time.time() - self.startTime, 3)
+            self.result.appendPlainText(f"[انتهى البناء خلال: {buildTime} ثانية]")
 
-        if self.res == 1:
+        if self.res == -2:
             try:
                 log = os.path.join(self.tempFile, "temp.alif.log")
                 log_open = open(log, "r", encoding="utf-8")
                 self.result.setPlainText(log_open.read())
                 log_open.close()
             except:
-                self.result.setPlainText("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح")
+                self.result.appendPlainText("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح")
 
     def runCode(self):
         self.startTime = time.time()
@@ -396,7 +397,7 @@ class MainWin(QMainWindow):
                 self.process.start(os.path.join(self.tempFile, "temp.exe"))
             self.isProcess = True
         else:
-            self.result.setPlainText("قم ببناء الشفرة أولاً")
+            self.result.appendPlainText("قم ببناء الشفرة أولاً")
 
     def ifReadReady(self):
         self.result.setReadOnly(False)
@@ -405,11 +406,11 @@ class MainWin(QMainWindow):
         self.result.appendPlainText(f"\n[انتهى التنفيذ خلال: {runTime} ثانية]")
 
     def resutlReturn(self, event):
-        self.cursor = self.result.textCursor()
-        self.cursor.movePosition(QTextCursor.MoveOperation.StartOfLine)
-        self.cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.KeepAnchor)
-        self.input = self.cursor.selectedText() + "\n"
         if event.key() == Qt.Key.Key_Return:
+            self.cursor = self.result.textCursor()
+            self.cursor.movePosition(QTextCursor.MoveOperation.StartOfLine)
+            self.cursor.movePosition(QTextCursor.MoveOperation.EndOfLine, QTextCursor.MoveMode.KeepAnchor)
+            self.input = self.cursor.selectedText() + "\n"
             if self.isProcess:
                 self.process.write(self.input.encode())
             print(self.input)
