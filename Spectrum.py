@@ -13,15 +13,15 @@ import os
 class MainWin(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setGeometry(0, 0, 1280, 720)
+        self.setGeometry(100, 500, 1280, 720)
         self.setMinimumSize(QSize(640, 360))
         self.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
 
-        self.vMainWinLay = QVBoxLayout(self)
+        self.vMainWinLay = QVBoxLayout()
         self.vMainWinLay.setContentsMargins(0, 0, 0, 0)
         self.vMainWinLay.setSpacing(0)
 
-        self.mainWid = QWidget(self)
+        self.mainWid = QWidget()
         self.mainWid.setStyleSheet("background-color:#1c1d20; border-radius: 7px")
 
         self.vMainWidLay = QVBoxLayout(self.mainWid)
@@ -50,7 +50,7 @@ class MainWin(QMainWindow):
         self.alifBtn.setFixedHeight(40)
         self.alifBtn.setFixedWidth(40)
         self.alifBtn.setStyleSheet("background-color: #1c1d20;border: 0px")
-        self.alifBtn.setIcon(QIcon("./icons/TaifLogo.svg"))
+        self.alifBtn.setIcon(QIcon("./Icons/TaifLogo.svg"))
         self.alifBtn.setIconSize(QSize(30, 30))
 
         self.hLogoFrmLay.addWidget(self.alifBtn)
@@ -81,7 +81,7 @@ class MainWin(QMainWindow):
         self.minimizeBtn.setStyleSheet("QPushButton{background-color: #1c1d20; border-radius: 3px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.minimizeBtn.setFixedHeight(25)
         self.minimizeBtn.setFixedWidth(25)
-        self.minimizeBtn.setIcon(QIcon("./icons/Minimize.svg"))
+        self.minimizeBtn.setIcon(QIcon("./Icons/Minimize.svg"))
         self.minimizeBtn.setIconSize(QSize(13, 13))
         self.minimizeBtn.clicked.connect(self.showMinimized)
 
@@ -91,7 +91,7 @@ class MainWin(QMainWindow):
         self.maximizeBtn.setStyleSheet("QPushButton{background-color: #1c1d20; border-radius: 3px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.maximizeBtn.setFixedWidth(25)
         self.maximizeBtn.setFixedHeight(25)
-        self.maximizeBtn.setIcon(QIcon("./icons/Maximize.svg"))
+        self.maximizeBtn.setIcon(QIcon("./Icons/Maximize.svg"))
         self.maximizeBtn.setIconSize(QSize(13, 13))
         self.maximizeBtn.clicked.connect(self.winRestore)
 
@@ -101,7 +101,7 @@ class MainWin(QMainWindow):
         self.closeBtn.setStyleSheet("QPushButton{background-color: #1c1d20; border-radius: 3px;}QPushButton:hover{background-color: #DA0000;}QPushButton:pressed{background-color: #323AAF;}")
         self.closeBtn.setFixedHeight(25)
         self.closeBtn.setFixedWidth(25)
-        self.closeBtn.setIcon(QIcon("./icons/Close.svg"))
+        self.closeBtn.setIcon(QIcon("./Icons/Close.svg"))
         self.closeBtn.setIconSize(QSize(13, 13))
         self.closeBtn.clicked.connect(self.close)
 
@@ -137,7 +137,7 @@ class MainWin(QMainWindow):
         self.newBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: #fff; border-radius: 7px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.newBtn.setFixedWidth(40)
         self.newBtn.setFixedHeight(40)
-        self.newBtn.setIcon(QIcon("./icons/New.svg"))
+        self.newBtn.setIcon(QIcon("./Icons/New.svg"))
         self.newBtn.setIconSize(QSize(25, 25))
         self.newBtn.clicked.connect(self.newFile)
 
@@ -148,7 +148,7 @@ class MainWin(QMainWindow):
         self.openBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: #fff; border-radius: 7px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.openBtn.setFixedWidth(40)
         self.openBtn.setFixedHeight(40)
-        self.openBtn.setIcon(QIcon("./icons/Open.svg"))
+        self.openBtn.setIcon(QIcon("./Icons/Open.svg"))
         self.openBtn.setIconSize(QSize(25, 25))
         self.openBtn.clicked.connect(self.openFile)
 
@@ -159,7 +159,7 @@ class MainWin(QMainWindow):
         self.saveBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: rgb(255, 255, 255); border-radius: 7px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.saveBtn.setFixedHeight(40)
         self.saveBtn.setFixedWidth(40)
-        self.saveBtn.setIcon(QIcon("./icons/Save.svg"))
+        self.saveBtn.setIcon(QIcon("./Icons/Save.svg"))
         self.saveBtn.setIconSize(QSize(25, 25))
         self.saveBtn.clicked.connect(self.saveFile)
 
@@ -170,7 +170,7 @@ class MainWin(QMainWindow):
         self.saveAsBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: rgb(255, 255, 255); border-radius: 7px;}QPushButton:hover{background-color: #4955FF;}QPushButton:pressed{background-color: #323AAF;}")
         self.saveAsBtn.setFixedHeight(40)
         self.saveAsBtn.setFixedWidth(40)
-        self.saveAsBtn.setIcon(QIcon("./icons/SaveAs.svg"))
+        self.saveAsBtn.setIcon(QIcon("./Icons/SaveAs.svg"))
         self.saveAsBtn.setIconSize(QSize(25, 25))
         self.saveAsBtn.clicked.connect(self.saveFileAs)
 
@@ -197,7 +197,7 @@ class MainWin(QMainWindow):
         self.runBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: rgb(255, 255, 255); border-radius: 7px;}QPushButton:hover{background-color: #F6FF43;}QPushButton:pressed{background-color: #DFE300;}")
         self.runBtn.setFixedWidth(40)
         self.runBtn.setFixedHeight(40)
-        self.runBtn.setIcon(QIcon("./icons/Run.svg"))
+        self.runBtn.setIcon(QIcon("./Icons/Run.svg"))
         self.runBtn.setIconSize(QSize(25, 25))
         self.runBtn.clicked.connect(self.runCode)
 
@@ -247,9 +247,9 @@ class MainWin(QMainWindow):
         self.resizeGrip.setFixedWidth(15)
         self.resizeGrip.setFixedHeight(15)
         self.resizeLable = QLabel(self.resizeGrip)
-        self.resizeLable.setPixmap(QPixmap("./icons/Resize.svg"))
+        self.resizeLable.setPixmap(QPixmap("./Icons/Resize.svg"))
 
-        QFileDialog.setWindowIcon(self, QIcon("./icons/Alif.ico"))
+        QFileDialog.setWindowIcon(self, QIcon("./Icons/Alif.ico"))
 
         self.hStatusLay.addWidget(self.resizeGrip)
         self.hMainFrmLay.addWidget(self.codeFrm)
@@ -270,10 +270,10 @@ class MainWin(QMainWindow):
     def winRestore(self):
         if self.isMaximized():
             self.mainWid.setStyleSheet("background-color: #1c1d20; border-radius: 10px")
-            self.maximizeBtn.setIcon(QIcon("./icons/Maximize.svg"))
+            self.maximizeBtn.setIcon(QIcon("./Icons/Maximize.svg"))
             self.showNormal()
         else:
-            self.maximizeBtn.setIcon(QIcon("./icons/Restore.svg"))
+            self.maximizeBtn.setIcon(QIcon("./Icons/Restore.svg"))
             self.mainWid.setStyleSheet("background-color: #1c1d20")
             self.showMaximized()
 
@@ -285,7 +285,7 @@ class MainWin(QMainWindow):
     def mouseMove(self, event):
         if self.pressedFlag:
             if self.isMaximized():
-                self.maximizeBtn.setIcon(QIcon("./icons/Maximize.svg"))
+                self.maximizeBtn.setIcon(QIcon("./Icons/Maximize.svg"))
                 self.mainWid.setStyleSheet("background-color: #1c1d20; border-radius: 10px")
                 self.showNormal()
                 self.oldPos = QPointF(self.pos()) + QPointF(640.0, 25.0)
@@ -366,20 +366,20 @@ class MainWin(QMainWindow):
             temporaryFile.write(code)
             temporaryFile.close()
 
-        if self.res == 0:
-            alifCom = os.path.join(self.tempFile, "temp.alif")
-            self.res = QProcess.execute("alif ", [alifCom])
 
+        alifCom = os.path.join(self.tempFile, "temp.alif")
+        self.res = QProcess.execute("alif", [alifCom])
+
+        if self.res == 0:
             buildTime = round(time.time() - self.startTime, 3)
             self.result.appendPlainText(f"[انتهى البناء خلال: {buildTime} ثانية]")
 
-        if self.res == -2:
-            try:
-                log = os.path.join(self.tempFile, "temp.alif.log")
-                log_open = open(log, "r", encoding="utf-8")
-                self.result.setPlainText(log_open.read())
-                log_open.close()
-            except:
+        if self.res == 1:
+            log = os.path.join(self.tempFile, "temp.alif.log")
+            logOpen = open(log, "r", encoding="utf-8")
+            self.result.appendPlainText(logOpen.read())
+            logOpen.close()
+        elif self.res == -2:
                 self.result.appendPlainText("تحقق من أن لغة ألف 3 مثبتة بشكل صحيح")
 
     def runCode(self):
