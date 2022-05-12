@@ -13,7 +13,7 @@
 
 ```bash
 # استنساخ المشروع من جت هب
-git clone https://github.com/alifcommunity/SpectrumIDE
+git clone https://github.com/alifcommunity/SpectrumIDEV1
 
 # تغيير دليل العمل الحالي
 cd SpectrumIDE
