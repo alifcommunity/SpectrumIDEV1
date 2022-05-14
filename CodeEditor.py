@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QPlainTextEdit, QFrame
 from PyQt6.QtGui import QPainter, QColor
 from PyQt6.QtCore import Qt, QRect
 import AlifSyntax
+import random
 
 
 #######################################################  تعريف المحرر ##################################################
@@ -65,7 +66,8 @@ class CodeEditor(QPlainTextEdit):
         while block.isValid() and (top <= event.rect().bottom()):
             if block.isVisible() and (bottom >= event.rect().top()):
                 number = str(blockNumber + 1)
-                painter.setPen(QColor("#BABABA"))
+                randcolor = lambda: random.randint(150,200)
+                painter.setPen(QColor("#%02X%02X%02X" % (randcolor(),randcolor(),randcolor())))
                 painter.drawText(0, int(top), self.lineNumberArea.width(), height, Qt.AlignmentFlag.AlignRight, number)
 
             block = block.next()
