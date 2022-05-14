@@ -2,16 +2,20 @@
 
 # محرر طيف | Spectrum IDE
 
+  
+<div dir="rtl">
+
+  <ul>
+
+<li> <a href="#pics">صور </a> </li>
+<li> <a href="#dep"> الاعتماديات </a> </li>
+<li> طريقة التثبيت </li>
 
 <ul>
 
-<li> <a href="#pics"> <h3>صور</h3> </a> </li>
-<li> <a href="#dep"> <h3>الاعتماديات</h3> </a> </li>
-<li> <h3>طريقة التثبيت</h3> </li>
+<li> <a href="#windows"> علي نظام ويندوز </a> </li> 
+<li> <a href="#linux"> علي نظام لينكس </a> </li> 
 
-<ul>
-<li> <a href="#windows"> <h3>علي نظام ويندوز</h3> </a> </li>
-<li> <a href="#linux"> <h3>علي نظام لينكس</h3> </a> </li>
 </ul>
 
 </ul>
@@ -93,7 +97,7 @@ python Spectrum.py
 
 </br>
 
-> ### على نظام لينكس ` (اوبنتو أو ديبيان) `
+> ### <a name="linux"></a> على نظام لينكس ` (اوبنتو أو ديبيان او احد بناتها) `
 
 <div dir=rtl>
 
@@ -120,7 +124,7 @@ apt install python3-venv
 # إنشاء البيئة الافتراضية
 python3 -m venv venv
 
-# تفعيل البيئة الافتراضية في نظام تشغيل لينكس/ماك
+# تفعيل البيئة الافتراضية في نظام تشغيل لينكس
 source venv/bin/activate
 ```
 
