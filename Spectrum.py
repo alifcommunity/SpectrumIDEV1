@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from PyQt6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QFrame, QApplication, QSizeGrip, QFileDialog, QPlainTextEdit
 from PyQt6.QtCore import QSize, Qt, QPointF, QProcess
 from PyQt6.QtGui import QIcon, QPixmap, QTextCursor
@@ -185,7 +187,7 @@ class MainWin(QMainWindow):
 
         self.buildBtn = QPushButton(self.runBtnFrm)
         self.buildBtn.setToolTip("بناء")
-        self.buildBtn.setStyleSheet("QPushButton{background-color: #1c1d20; color: rgb(255, 255, 255); border-radius: 7px;}QPushButton:hover{background-color: #FF5733;}QPushButton:pressed{background-color: #323AAF;}")
+        self.buildBtn.setStyleSheet("QPushButton{background-color: #323AAF; color: rgb(255, 255, 255); border-radius: 7px;}QPushButton:hover{background-color: #FF5733;}QPushButton:pressed{background-color: #323AAF;}")
         self.buildBtn.setFixedWidth(40)
         self.buildBtn.setFixedHeight(40)
         self.buildBtn.setIcon(QIcon("./icons/Build.svg"))

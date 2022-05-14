@@ -1,12 +1,51 @@
 <div dir="rtl">
- 
+
 # محرر طيف | Spectrum IDE
-بيئة تطوير لغة ألف 3
+
+  
+<div dir="rtl">
+
+  <ul>
+
+<li> <a href="#pics">صور </a> </li>
+<li> <a href="#dep"> الاعتماديات </a> </li>
+<li> طريقة التثبيت </li>
+
+<ul>
+
+<li> <a href="#windows"> علي نظام ويندوز </a> </li> 
+<li> <a href="#linux"> علي نظام لينكس </a> </li> 
+
+</ul>
+
+</ul>
+
+<hr>
+
+## <a name="pics"></a>بيئة تطوير لغة ألف 3
 
 ![SpectrumUI](https://user-images.githubusercontent.com/77246874/129458934-1bd6166e-9f30-445e-ab9b-9a9b6e7b1d21.png)
 
-طريقة التتبيث 
- 
+## <a name="dep"></a>الاعتماديات 
+
+</br>
+
+<div dir=ltr>
+
+`python3 python3-venv PyQt6`
+
+</br>
+
+<div dir=rtl>
+
+## طريقة التتبيث
+
+</br>
+
+> ### <a name="windows"></a>على نظام ويندوز
+
+<div dir=rtl>
+
 اولا قم بتثبيت الخطوط المرفقة
 
 <div dir=ltr>
@@ -18,6 +57,7 @@ git clone https://github.com/alifcommunity/SpectrumIDEV1
 # تغيير دليل العمل الحالي
 cd SpectrumIDE
 ```
+
 <div dir="rtl">
 إنشاء بيئة افتراضية (اختياري)
 <div dir=ltr>
@@ -28,28 +68,88 @@ python3 -m venv venv
 
 # تفعيل البيئة الافتراضية في نظام تشغيل ويندوز
 venv\Scripts\activate.bat
-
-# تفعيل البيئة الافتراضية في نظام تشغيل لينكس/ماك
-source venv/bin/activate
 ```
+
 <div dir="rtl">
 
 تنزيل المكاتب
- 
- 
+
+
 <div dir="ltr">
 
 ```bash
-pip3 install -r requirements.txt
+# محدث لاخر اصدار pip تاكد ان
+pip install --upgrade pip
+# تنزيل المكتبات
+pip install -r requirements.txt
 ```
+
 <div dir="rtl">
-تنفيذ
- 
- 
+تشغيل المحرر
+
 <div dir=ltr>
- 
+
 ```bash
 python Spectrum.py
 ```
+
 <div dir="rtl">
- 
+
+</br>
+
+> ### <a name="linux"></a> على نظام لينكس ` (اوبنتو أو ديبيان او احد بناتها) `
+
+<div dir=rtl>
+
+اولا قم بتثبيت الخطوط المرفقة
+
+<div dir=ltr>
+
+```bash
+# استنساخ المشروع من جت هب
+git clone https://github.com/alifcommunity/SpectrumIDEV1
+
+# تغيير دليل العمل الحالي
+cd SpectrumIDE
+```
+
+<div dir="rtl">
+إنشاء بيئة افتراضية (اختياري)
+<div dir=ltr>
+
+```bash
+# تنزيل الاعتمادية
+apt install python3-venv
+
+# إنشاء البيئة الافتراضية
+python3 -m venv venv
+
+# تفعيل البيئة الافتراضية في نظام تشغيل لينكس
+source venv/bin/activate
+```
+
+<div dir="rtl">
+
+تنزيل المكاتب
+
+
+<div dir="ltr">
+
+```bash
+# محدث لاخر اصدار pip تاكد ان
+pip install --upgrade pip
+# تنزيل المكتبات
+pip install -r requirements.txt
+```
+
+<div dir="rtl">
+تشغيل المحرر
+
+<div dir=ltr>
+
+```bash
+python3 Spectrum.py
+```
+
+<div dir="rtl">
+
