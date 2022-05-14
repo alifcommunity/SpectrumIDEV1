@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from PyQt6.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QHBoxLayout, QVBoxLayout, QFrame, QApplication, QSizeGrip, QFileDialog, QPlainTextEdit
 from PyQt6.QtCore import QSize, Qt, QPointF, QProcess
 from PyQt6.QtGui import QIcon, QPixmap, QTextCursor
