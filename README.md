@@ -74,6 +74,9 @@ venv\Scripts\activate.bat
 <div dir="ltr">
 
 ```bash
+# محدث لاخر اصدار pip تاكد ان
+pip install --upgrade pip
+# تنزيل المكتبات
 pip install -r requirements.txt
 ```
 
@@ -129,6 +132,9 @@ source venv/bin/activate
 <div dir="ltr">
 
 ```bash
+# محدث لاخر اصدار pip تاكد ان
+pip install --upgrade pip
+# تنزيل المكتبات
 pip install -r requirements.txt
 ```
 
